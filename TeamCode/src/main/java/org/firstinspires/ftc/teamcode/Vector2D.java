@@ -43,4 +43,16 @@ public class Vector2D {
 	public Vector2D rotateCWFor(double rads) {
 		return rotateCCWFor(-rads);
 	}
+
+	/// Returns the length of this vector
+	public double length() {
+		return Math.sqrt(this.x * this.x + this.y * this.y);
+	}
+
+	/// Makes the length of this vector 1 and returns the result
+	public Vector2D normalize() {
+		double length = length();
+
+		return new Vector2D(this.x / length, this.y / length);
+	}
 }

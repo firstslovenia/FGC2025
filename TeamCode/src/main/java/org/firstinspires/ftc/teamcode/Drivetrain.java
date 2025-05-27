@@ -6,9 +6,15 @@ import org.opencv.core.Mat;
 
 public class Drivetrain {
 
+	private Hardware hardware_map;
+
+	public Drivetrain(Hardware hw_map) {
+		hardware_map = hw_map;
+	}
+
 	/// Computes (magnitude, phi) from x and y values of a joystick
 	///
-	/// (x, y in [-1, 1])
+	/// (x, y in \[-1, 1\])
 	///
 	/// eg. if we look between phi = 0 and PI / 2:
 	///
@@ -60,5 +66,38 @@ public class Drivetrain {
 		double magnitude = Math.sqrt(x * x + y * y);
 
 		return new Pair<>(magnitude, phi);
+	}
+
+	/// Updates the drive motors to go with \[0, 1\] power in the (relative) direction phi radians while turning with power \[-1, 1\] clockwise
+	public void update(double power, double direction, double turn) {
+
+		power = Math.min(power, 1.0);
+		power = Math.max(power, 0.0);
+
+		turn = Math.min(turn, 1.0);
+		turn = Math.max(turn, -1.0);
+
+		double sin_phi = Math.sin(direction);
+		double cos_phi = Math.cos(direction);
+
+		double leftBack = (sin_phi * power) + turn;
+		double rightFront = (sin_phi * power) - turn;
+		double leftFront = (cos_phi * power) + turn;
+		double rightBack = (cos_phi * power) - turn;
+
+		// Normalize all of them to get the expected result
+		double maxPower = Math.max(Math.max(leftBack, rightFront), Math.max(leftFront, rightBack));
+
+		if (maxPower > 1.0) {
+			leftBack /= maxPower;
+			rightFront /= maxPower;
+			leftFront /= maxPower;
+			rightBack /= maxPower;
+		}
+
+		hardware_map.leftBackMotor.setPower(leftBack);
+		hardware_map.rightFrontMotor.setPower(rightFront);
+		hardware_map.leftFrontMotor.setPower(leftFront);
+		hardware_map.rightBackMotor.setPower(rightBack);
 	}
 }
