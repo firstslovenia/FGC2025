@@ -2,8 +2,6 @@ package org.firstinspires.ftc.teamcode;
 
 import android.util.Pair;
 
-import org.opencv.core.Mat;
-
 public class Drivetrain {
 
 	private Hardware hardware_map;
@@ -80,8 +78,8 @@ public class Drivetrain {
 		double sin_phi = Math.sin(direction);
 		double cos_phi = Math.cos(direction);
 
-		double leftBack = (sin_phi * power) + turn;
-		double rightFront = (sin_phi * power) - turn;
+		double leftBack = (sin_phi * power) - turn;
+		double rightFront = (sin_phi * power) + turn;
 		double leftFront = (cos_phi * power) + turn;
 		double rightBack = (cos_phi * power) - turn;
 
