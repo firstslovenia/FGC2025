@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.*;
 import org.firstinspires.ftc.teamcode.Drivetrain;
 import org.firstinspires.ftc.teamcode.Hardware;
 import org.firstinspires.ftc.teamcode.Odometry;
+import org.firstinspires.ftc.teamcode.Vector2D;
 
 @TeleOp(name = "DrivetrainTest")
 public class DrivetrainTest extends LinearOpMode {
@@ -15,31 +16,19 @@ public class DrivetrainTest extends LinearOpMode {
 	Drivetrain drivetrain;
 	Odometry odometry;
 
-	static boolean field_centric = false;
-
 	@Override
 	public void runOpMode() {
 
 		hardware = new Hardware(this);
 		hardware.init();
 
-		drivetrain = new Drivetrain(hardware);
 		odometry = new Odometry(this, hardware);
+		drivetrain = new Drivetrain(this, hardware, odometry);
 
 		waitForStart();
 
 		while (opModeIsActive()) {
-			Pair<Double, Double> magnitude_and_direction = Drivetrain.getMagnitudeAndPhiFor(gamepad1.left_stick_x, gamepad1.left_stick_y);
-
-			// Gamepads like to give us both x and y between 0 and 1, meaning the length can be between 0 and sqrt(2)
-			double power = magnitude_and_direction.first / Math.sqrt(2);
-			double direction = magnitude_and_direction.second;
-
-			if (field_centric) {
-				direction = direction - odometry.heading;
-			}
-
-			drivetrain.update(power, direction, gamepad1.right_stick_x);
+			drivetrain.update(new Vector2D(gamepad1.left_stick_x, gamepad1.left_stick_y), new Vector2D(gamepad1.right_stick_x, gamepad1.right_stick_y));
 			odometry.update();
 			telemetry.update();
 		}

@@ -2,12 +2,24 @@ package org.firstinspires.ftc.teamcode;
 
 import android.util.Pair;
 
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+
 public class Drivetrain {
 
-	private Hardware hardware_map;
+	LinearOpMode callingOpmode;
+ 	Hardware hardware;
+	Odometry odometry;
 
-	public Drivetrain(Hardware hw_map) {
-		hardware_map = hw_map;
+	/// Whether or not to make translation field centric via our odometry heading
+	public boolean fieldCentricTranslation = false;
+
+	/// Whether or not to make rotation field centric - users input a target rotation on the rotation stick
+	public boolean fieldCentricRotation = false;
+
+	public Drivetrain(LinearOpMode opMode, Hardware hw_map, Odometry odometry) {
+		callingOpmode = opMode;
+		hardware = hw_map;
+		this.odometry = odometry;
 	}
 
 	/// Computes (magnitude, phi) from x and y values of a joystick
@@ -66,22 +78,69 @@ public class Drivetrain {
 		return new Pair<>(magnitude, phi);
 	}
 
-	/// Updates the drive motors to go with \[0, 1\] power in the (relative) direction phi radians while turning with power \[-1, 1\] clockwise
-	public void update(double power, double direction, double turn) {
+	/// Updates the drive motors based off a translation and rotation stick
+	public void update(Vector2D translation_stick, Vector2D rotation_stick) {
 
-		power = Math.min(power, 1.0);
-		power = Math.max(power, 0.0);
+		Pair<Double, Double> translation_inputs = Drivetrain.getMagnitudeAndPhiFor(translation_stick.x, translation_stick.y);
 
-		turn = Math.min(turn, 1.0);
-		turn = Math.max(turn, -1.0);
+		// Gamepads like to give us both x and y between 0 and 1, meaning the length can be between 0 and sqrt(2)
+		double translation_power = translation_inputs.first / Math.sqrt(2);
+		double translation_direction = translation_inputs.second;
 
-		double sin_phi = Math.sin(direction);
-		double cos_phi = Math.cos(direction);
+		if (fieldCentricTranslation) {
+			translation_direction = translation_direction - odometry.heading;
+		}
 
-		double leftForward = (sin_phi * power) + turn;
-		double rightForward = (sin_phi * power) - turn;
-		double frontSideways = (cos_phi * power) + turn;
-		double backSideways = (cos_phi * power) - turn;
+		translation_power = Math.min(translation_power, 1.0);
+		translation_power = Math.max(translation_power, 0.0);
+
+		// How much power to use for clockwise rotation, between -1 and 1
+		//
+		// (-1 for max counterclockwise power)
+		double clockwise_rotation_power = 0.0;
+
+		if (fieldCentricRotation) {
+			Pair<Double, Double> rotation_inputs = Drivetrain.getMagnitudeAndPhiFor(rotation_stick.x, rotation_stick.y);
+
+			// Gamepads like to give us both x and y between 0 and 1, meaning the length can be between 0 and sqrt(2)
+			double rotation_power = rotation_inputs.first / Math.sqrt(2);
+
+			double wanted_heading = rotation_inputs.second;
+
+			// Our heading has 0 as forward, not as to the right - adjust by 90 degrees
+			wanted_heading = wanted_heading - Math.PI / 2;
+
+			if (rotation_power > 0.3) {
+				double needed_turn = wanted_heading - odometry.heading;
+
+				// Only turn if the wanted turn is > 1 degree
+				double epsilon = Math.PI / 180;
+
+				if (Math.abs(needed_turn) > epsilon) {
+					if (needed_turn > 0) {
+						// Our turn direction needs to be positive, meaning counterclockwise
+						clockwise_rotation_power = -1.0;
+					} else {
+						// Our turn direction needs to be negative, meaning clockwise
+						clockwise_rotation_power = 1.0;
+					}
+				}
+			}
+
+		} else {
+			clockwise_rotation_power = rotation_stick.x;
+		}
+
+		clockwise_rotation_power = Math.min(clockwise_rotation_power, 1.0);
+		clockwise_rotation_power = Math.max(clockwise_rotation_power, -1.0);
+
+		double sin_phi = Math.sin(translation_direction);
+		double cos_phi = Math.cos(translation_direction);
+
+		double leftForward = (sin_phi * translation_power) + clockwise_rotation_power;
+		double rightForward = (sin_phi * translation_power) - clockwise_rotation_power;
+		double frontSideways = (cos_phi * translation_power) + clockwise_rotation_power;
+		double backSideways = (cos_phi * translation_power) - clockwise_rotation_power;
 
 		// Normalize all of them to get the expected result
 		double maxPower = Math.max(Math.max(Math.abs(leftForward), Math.abs(rightForward)), Math.max(Math.abs(frontSideways), Math.abs(backSideways)));
@@ -93,9 +152,9 @@ public class Drivetrain {
 			backSideways /= maxPower;
 		}
 
-		hardware_map.leftForwardMotor.setPower(leftForward);
-		hardware_map.rightForwardMotor.setPower(rightForward);
-		hardware_map.frontSidewaysMotor.setPower(frontSideways);
-		hardware_map.backSidewaysMotor.setPower(backSideways);
+		hardware.leftForwardMotor.setPower(leftForward);
+		hardware.rightForwardMotor.setPower(rightForward);
+		hardware.frontSidewaysMotor.setPower(frontSideways);
+		hardware.backSidewaysMotor.setPower(backSideways);
 	}
 }
