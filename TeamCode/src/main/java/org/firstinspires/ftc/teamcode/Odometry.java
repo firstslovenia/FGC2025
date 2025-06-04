@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
 
 /// Implementation of odometry using only the drive motor encoders, assuming they don't slide
 ///
@@ -30,10 +29,10 @@ public class Odometry {
 	static double radsPerStep = 2 * Math.PI / magicStepsForTwoPi;
 
 	// Motor directions - how our wheels turn (relative to +y = forward and +x = right) in relation to our motors
-	Vector2D leftFrontVector = new Vector2D(1, 0);
-	Vector2D rightFrontVector = new Vector2D(0, 1);
-	Vector2D leftBackVector = new Vector2D(0, 1);
-	Vector2D rightBackVector = new Vector2D(1, 0);
+	Vector2D frontSidewaysVector = new Vector2D(1, 0);
+	Vector2D rightForwardVector = new Vector2D(0, 1);
+	Vector2D leftForwardVector = new Vector2D(0, 1);
+	Vector2D backSidewaysVector = new Vector2D(1, 0);
 
 	/// A 2d vector of our position, relative to where we started
 	///
@@ -46,10 +45,10 @@ public class Odometry {
 	public Double heading = 0.0;
 
 	// The positions of our motor encoders at our last update
-	int lastLeftFrontPosition = 0;
-	int lastRightFrontPosition = 0;
-	int lastLeftBackPosition = 0;
-	int lastRightBackPosition = 0;
+	int lastFrontSidewaysPosition = 0;
+	int lastRightForwardPosition = 0;
+	int lastLeftForwardPosition = 0;
+	int lastBackSidewaysPosition = 0;
 
 	public Odometry(LinearOpMode opmode, Hardware hardware) {
 		this.hardware = hardware;
@@ -57,14 +56,14 @@ public class Odometry {
 	}
 
 	/// Updates our position and heading assuming our motors turned some steps
-	public void updateForStepDelta(int leftFrontDelta, int rightFrontDelta, int leftBackDelta, int rightBackDelta) {
-		Vector2D left_front_steps = leftFrontVector.mul_by(leftFrontDelta);
-		Vector2D right_front_steps = rightFrontVector.mul_by(rightFrontDelta);
-		Vector2D left_back_steps = leftBackVector.mul_by(leftBackDelta);
-		Vector2D right_back_steps = rightBackVector.mul_by(rightBackDelta);
+	public void updateForStepDelta(int frontSidewaysDelta, int rightForwardDelta, int leftForwardDelta, int backSidewaysDelta) {
+		Vector2D front_side_steps = frontSidewaysVector.mul_by(frontSidewaysDelta);
+		Vector2D back_side_steps = backSidewaysVector.mul_by(backSidewaysDelta);
+		Vector2D right_fwd_steps = rightForwardVector.mul_by(rightForwardDelta);
+		Vector2D left_fwd_steps = leftForwardVector.mul_by(leftForwardDelta);
 
 		// Vectors added together -> translation
-		Vector2D translation_steps = left_front_steps.add(right_front_steps).add(left_back_steps).add(right_back_steps);
+		Vector2D translation_steps = front_side_steps.add(back_side_steps).add(right_fwd_steps).add(left_fwd_steps);
 		Vector2D translation_meters = translation_steps.mul_by(metersPerStep);
 
 		position = position.add(translation_meters);
@@ -80,7 +79,7 @@ public class Odometry {
 		//  ║ | ⌃ (+)   (-)  <-  ║
 		//  ║ ⌄             <--> ║
 		//  ╚════════════════════╝
-		Double rotation_steps = (double) (leftBackDelta + leftFrontDelta - rightFrontDelta - rightBackDelta);
+		Double rotation_steps = (double) (leftForwardDelta + frontSidewaysDelta - rightForwardDelta - backSidewaysDelta);
 		Double rotation_clockwise_delta = rotation_steps * radsPerStep;
 
 		// Unit circle rotation is counterclockwise
@@ -90,34 +89,34 @@ public class Odometry {
 	/// Updates our position and heading based off the current motor positions and the ones from the last update
 	public void update() {
 
-		int leftFrontPosition = hardware.leftFrontMotor.getCurrentPosition();
-		int rightFrontPosition = hardware.rightFrontMotor.getCurrentPosition();
-		int leftBackPosition = hardware.leftBackMotor.getCurrentPosition();
-		int rightBackPosition = hardware.rightBackMotor.getCurrentPosition();
+		int frontSidewaysPosition = hardware.frontSidewaysMotor.getCurrentPosition();
+		int backSidewaysPosition = hardware.backSidewaysMotor.getCurrentPosition();
+		int rightForwardPosition = hardware.rightForwardMotor.getCurrentPosition();
+		int leftForwardPosition = hardware.leftForwardMotor.getCurrentPosition();
 
-		int leftFrontDelta = leftFrontPosition - lastLeftFrontPosition;
-		int rightFrontDelta = rightFrontPosition - lastRightFrontPosition;
-		int leftBackDelta = leftBackPosition - lastLeftBackPosition;
-		int rightBackDelta = rightBackPosition - lastRightBackPosition;
+		int frontSidewaysDelta = frontSidewaysPosition - lastFrontSidewaysPosition;
+		int backSidewaysDelta = backSidewaysPosition - lastBackSidewaysPosition;
+		int rightForwardDelta = rightForwardPosition - lastRightForwardPosition;
+		int leftForwardDelta = leftForwardPosition - lastLeftForwardPosition;
 
-		updateForStepDelta(leftFrontDelta, rightFrontDelta, leftBackDelta, rightBackDelta);
+		updateForStepDelta(frontSidewaysDelta, rightForwardDelta, leftForwardDelta, backSidewaysDelta);
 
 		callingOpMode.telemetry.addData("heading (rads)", heading);
 		callingOpMode.telemetry.addData("heading (deg)", Math.toDegrees(heading));
 		callingOpMode.telemetry.addData("position (x)", position.x);
 		callingOpMode.telemetry.addData("position (y)", position.x);
-		callingOpMode.telemetry.addData("n  left  front", leftFrontPosition);
-		callingOpMode.telemetry.addData("n  right front", rightFrontPosition);
-		callingOpMode.telemetry.addData("n  left  back ", leftBackPosition);
-		callingOpMode.telemetry.addData("n  right back ", rightBackPosition);
-		callingOpMode.telemetry.addData("Δn left  front", leftFrontDelta);
-		callingOpMode.telemetry.addData("Δn right front", leftFrontDelta);
-		callingOpMode.telemetry.addData("Δn left  back ", leftFrontDelta);
-		callingOpMode.telemetry.addData("Δn right back ", leftFrontDelta);
+		callingOpMode.telemetry.addData("n  front sideways", frontSidewaysPosition);
+		callingOpMode.telemetry.addData("n  back  sideways", backSidewaysPosition);
+		callingOpMode.telemetry.addData("n  right forward ", rightForwardPosition);
+		callingOpMode.telemetry.addData("n  left  forward ", leftForwardPosition);
+		callingOpMode.telemetry.addData("Δn front sideways", frontSidewaysDelta);
+		callingOpMode.telemetry.addData("Δn back  sideways", backSidewaysDelta);
+		callingOpMode.telemetry.addData("Δn right forward ", rightForwardDelta);
+		callingOpMode.telemetry.addData("Δn left  forward ", leftForwardDelta);
 
-		lastLeftFrontPosition = leftFrontPosition;
-		lastRightFrontPosition = rightFrontPosition;
-		lastLeftBackPosition = leftBackPosition;
-		lastRightBackPosition = rightBackPosition;
+		lastFrontSidewaysPosition = frontSidewaysPosition;
+		lastBackSidewaysPosition = backSidewaysPosition;
+		lastRightForwardPosition = rightForwardPosition;
+		lastLeftForwardPosition = leftForwardPosition;
 	}
 }

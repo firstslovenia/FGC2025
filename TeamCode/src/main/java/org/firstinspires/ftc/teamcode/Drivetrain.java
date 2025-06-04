@@ -78,24 +78,24 @@ public class Drivetrain {
 		double sin_phi = Math.sin(direction);
 		double cos_phi = Math.cos(direction);
 
-		double leftBack = (sin_phi * power) + turn;
-		double rightFront = (sin_phi * power) - turn;
-		double leftFront = (cos_phi * power) + turn;
-		double rightBack = (cos_phi * power) - turn;
+		double leftForward = (sin_phi * power) + turn;
+		double rightForward = (sin_phi * power) - turn;
+		double frontSideways = (cos_phi * power) + turn;
+		double backSideways = (cos_phi * power) - turn;
 
 		// Normalize all of them to get the expected result
-		double maxPower = Math.max(Math.max(Math.abs(leftBack), Math.abs(rightFront)), Math.max(Math.abs(leftFront), Math.abs(rightBack)));
+		double maxPower = Math.max(Math.max(Math.abs(leftForward), Math.abs(rightForward)), Math.max(Math.abs(frontSideways), Math.abs(backSideways)));
 
 		if (maxPower > 1.0) {
-			leftBack /= maxPower;
-			rightFront /= maxPower;
-			leftFront /= maxPower;
-			rightBack /= maxPower;
+			leftForward /= maxPower;
+			rightForward /= maxPower;
+			frontSideways /= maxPower;
+			backSideways /= maxPower;
 		}
 
-		hardware_map.leftBackMotor.setPower(leftBack);
-		hardware_map.rightFrontMotor.setPower(rightFront);
-		hardware_map.leftFrontMotor.setPower(leftFront);
-		hardware_map.rightBackMotor.setPower(rightBack);
+		hardware_map.leftForwardMotor.setPower(leftForward);
+		hardware_map.rightForwardMotor.setPower(rightForward);
+		hardware_map.frontSidewaysMotor.setPower(frontSideways);
+		hardware_map.backSidewaysMotor.setPower(backSideways);
 	}
 }

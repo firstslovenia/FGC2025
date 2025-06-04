@@ -9,34 +9,34 @@ public class Hardware {
 	private LinearOpMode callingOpMode = null;
 
 	//  Motor configuration:
-	//  ╔════════════════════╗
-	//  ║ <-->             ⌃ ║
-	//  ║  left      right | ║
-	//  ║  front     front ⌄ ║
-	//  ║                    ║
-	//  ║ ⌃ left       right ║
-	//  ║ | back       back  ║
-	//  ║ ⌄             <--> ║
-	//  ╚════════════════════╝
+	//  ╔═════════════════════╗
+	//  ║ <-->              ⌃ ║
+	//  ║ front       right | ║
+	//  ║ sideways  forward ⌄ ║
+	//  ║                     ║
+	//  ║ ⌃ left         back ║
+	//  ║ | forward  sideways ║
+	//  ║ ⌄              <--> ║
+	//  ╚═════════════════════╝
 
-	public static DcMotor leftFrontMotor = null;
-	public static DcMotor rightFrontMotor = null;
-	public static DcMotor leftBackMotor = null;
-	public static DcMotor rightBackMotor= null;
+	public static DcMotor frontSidewaysMotor = null;
+	public static DcMotor rightForwardMotor = null;
+	public static DcMotor leftForwardMotor = null;
+	public static DcMotor backSidewaysMotor = null;
 
 	public Hardware (LinearOpMode opmode) {
 		callingOpMode = opmode;
 	}
 
 	public void init()    {
-		leftFrontMotor  = callingOpMode.hardwareMap.get(DcMotor.class, "leftFront");
-		rightFrontMotor  = callingOpMode.hardwareMap.get(DcMotor.class, "rightFront");
-		leftBackMotor  = callingOpMode.hardwareMap.get(DcMotor.class, "leftBack");
-		rightBackMotor  = callingOpMode.hardwareMap.get(DcMotor.class, "rightBack");
+		frontSidewaysMotor = callingOpMode.hardwareMap.get(DcMotor.class, "frontSideways");
+		rightForwardMotor = callingOpMode.hardwareMap.get(DcMotor.class, "rightForward");
+		leftForwardMotor = callingOpMode.hardwareMap.get(DcMotor.class, "leftForward");
+		backSidewaysMotor = callingOpMode.hardwareMap.get(DcMotor.class, "backSideways");
 
 		// Make the positive direction on motor (+x, +y) --> up and to the right, like a cartesian coordinate system
 		// (This is assuming the motors spin clockwise and their directions are flipped once by gears)
-		leftFrontMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-		leftBackMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+		frontSidewaysMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+		leftForwardMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 	}
 }
