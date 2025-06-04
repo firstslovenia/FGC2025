@@ -37,6 +37,6 @@ public class Hardware {
 		// Make the positive direction on motor (+x, +y) --> up and to the right, like a cartesian coordinate system
 		// (This is assuming the motors spin clockwise and their directions are flipped once by gears)
 		leftFrontMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-		rightFrontMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+		leftBackMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 	}
 }

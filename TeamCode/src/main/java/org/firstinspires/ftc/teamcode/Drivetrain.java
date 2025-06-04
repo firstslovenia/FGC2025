@@ -78,13 +78,13 @@ public class Drivetrain {
 		double sin_phi = Math.sin(direction);
 		double cos_phi = Math.cos(direction);
 
-		double leftBack = (sin_phi * power) - turn;
-		double rightFront = (sin_phi * power) + turn;
+		double leftBack = (sin_phi * power) + turn;
+		double rightFront = (sin_phi * power) - turn;
 		double leftFront = (cos_phi * power) + turn;
 		double rightBack = (cos_phi * power) - turn;
 
 		// Normalize all of them to get the expected result
-		double maxPower = Math.max(Math.max(leftBack, rightFront), Math.max(leftFront, rightBack));
+		double maxPower = Math.max(Math.max(Math.abs(leftBack), Math.abs(rightFront)), Math.max(Math.abs(leftFront), Math.abs(rightBack)));
 
 		if (maxPower > 1.0) {
 			leftBack /= maxPower;
