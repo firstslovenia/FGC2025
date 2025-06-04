@@ -15,6 +15,8 @@ public class DrivetrainTest extends LinearOpMode {
 	Drivetrain drivetrain;
 	Odometry odometry;
 
+	static boolean field_centric = false;
+
 	@Override
 	public void runOpMode() {
 
@@ -22,7 +24,7 @@ public class DrivetrainTest extends LinearOpMode {
 		hardware.init();
 
 		drivetrain = new Drivetrain(hardware);
-		odometry = new Odometry(hardware);
+		odometry = new Odometry(this, hardware);
 
 		waitForStart();
 
@@ -33,8 +35,13 @@ public class DrivetrainTest extends LinearOpMode {
 			double power = magnitude_and_direction.first / Math.sqrt(2);
 			double direction = magnitude_and_direction.second;
 
+			if (field_centric) {
+				direction = direction - odometry.heading;
+			}
+
 			drivetrain.update(power, direction, gamepad1.right_stick_x);
 			odometry.update();
+			telemetry.update();
 		}
 	}
 }

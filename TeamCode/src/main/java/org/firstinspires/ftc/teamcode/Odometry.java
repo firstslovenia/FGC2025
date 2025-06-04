@@ -1,11 +1,14 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 /// Implementation of odometry using only the drive motor encoders, assuming they don't slide
 ///
 /// This is used primary to keep track of our heading for field centric movement and rotation
 public class Odometry {
+
+	LinearOpMode callingOpMode = null;
 	Hardware hardware;
 
 	// Calibration values
@@ -35,12 +38,12 @@ public class Odometry {
 	/// A 2d vector of our position, relative to where we started
 	///
 	/// 1 unit = 1 meter
-	Vector2D position = new Vector2D();
+	public Vector2D position = new Vector2D();
 
-	/// Radian heading of our robot in a unit circle
+	/// How much our robot has rotated since the beginning, in radians
 	///
 	/// Element of [0, 2 * Pi)
-	Double heading = 0.0;
+	public Double heading = 0.0;
 
 	// The positions of our motor encoders at our last update
 	int lastLeftFrontPosition = 0;
@@ -48,8 +51,9 @@ public class Odometry {
 	int lastLeftBackPosition = 0;
 	int lastRightBackPosition = 0;
 
-	public Odometry(Hardware hardware) {
+	public Odometry(LinearOpMode opmode, Hardware hardware) {
 		this.hardware = hardware;
+		callingOpMode = opmode;
 	}
 
 	/// Updates our position and heading assuming our motors turned some steps
@@ -80,7 +84,7 @@ public class Odometry {
 		Double rotation_clockwise_delta = rotation_steps * radsPerStep;
 
 		// Unit circle rotation is counterclockwise
-		heading = heading - rotation_clockwise_delta;
+		heading = (heading - rotation_clockwise_delta) % (2 * Math.PI);
 	}
 
 	/// Updates our position and heading based off the current motor positions and the ones from the last update
@@ -97,6 +101,19 @@ public class Odometry {
 		int rightBackDelta = rightBackPosition - lastRightBackPosition;
 
 		updateForStepDelta(leftFrontDelta, rightFrontDelta, leftBackDelta, rightBackDelta);
+
+		callingOpMode.telemetry.addData("heading (rads)", heading);
+		callingOpMode.telemetry.addData("heading (deg)", Math.toDegrees(heading));
+		callingOpMode.telemetry.addData("position (x)", position.x);
+		callingOpMode.telemetry.addData("position (y)", position.x);
+		callingOpMode.telemetry.addData("n  left  front", leftFrontPosition);
+		callingOpMode.telemetry.addData("n  right front", rightFrontPosition);
+		callingOpMode.telemetry.addData("n  left  back ", leftBackPosition);
+		callingOpMode.telemetry.addData("n  right back ", rightBackPosition);
+		callingOpMode.telemetry.addData("Δn left  front", leftFrontDelta);
+		callingOpMode.telemetry.addData("Δn right front", leftFrontDelta);
+		callingOpMode.telemetry.addData("Δn left  back ", leftFrontDelta);
+		callingOpMode.telemetry.addData("Δn right back ", leftFrontDelta);
 
 		lastLeftFrontPosition = leftFrontPosition;
 		lastRightFrontPosition = rightFrontPosition;
