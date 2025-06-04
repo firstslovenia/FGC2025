@@ -25,6 +25,16 @@ public class Vector2D {
 		return new Vector2D(this.x - other.x, this.y - other.y);
 	}
 
+	/// Multiplies both components by a scalar value
+	public Vector2D mul_by(double scalar) {
+		return new Vector2D(this.x * scalar, this.y * scalar);
+	}
+
+	/// Divides both components by a scalar value
+	public Vector2D div_by(double scalar) {
+		return new Vector2D(this.x / scalar, this.y / scalar);
+	}
+
 	/// Returns the scalar product of both vectors
 	public double scalarProduct(Vector2D other) {
 		return this.x * other.x + this.y * other.y;

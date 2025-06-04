@@ -6,12 +6,14 @@ import com.qualcomm.robotcore.eventloop.opmode.*;
 
 import org.firstinspires.ftc.teamcode.Drivetrain;
 import org.firstinspires.ftc.teamcode.Hardware;
+import org.firstinspires.ftc.teamcode.Odometry;
 
 @TeleOp(name = "DrivetrainTest")
 public class DrivetrainTest extends LinearOpMode {
 
 	Hardware hardware;
 	Drivetrain drivetrain;
+	Odometry odometry;
 
 	@Override
 	public void runOpMode() {
@@ -20,6 +22,7 @@ public class DrivetrainTest extends LinearOpMode {
 		hardware.init();
 
 		drivetrain = new Drivetrain(hardware);
+		odometry = new Odometry(hardware);
 
 		waitForStart();
 
@@ -31,6 +34,7 @@ public class DrivetrainTest extends LinearOpMode {
 			double direction = magnitude_and_direction.second;
 
 			drivetrain.update(power, direction, gamepad1.right_stick_x);
+			odometry.update();
 		}
 	}
 }
