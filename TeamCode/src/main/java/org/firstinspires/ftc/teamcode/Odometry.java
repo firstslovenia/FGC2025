@@ -62,8 +62,12 @@ public class Odometry {
 		Vector2D right_fwd_steps = rightForwardVector.mul_by(rightForwardDelta);
 		Vector2D left_fwd_steps = leftForwardVector.mul_by(leftForwardDelta);
 
-		// Vectors added together -> translation
+		// Vectors added together -> local translation
 		Vector2D translation_steps = front_side_steps.add(back_side_steps).add(right_fwd_steps).add(left_fwd_steps);
+		
+		// Account for our heading: local -> global
+		translation_steps = translation_steps.rotateCCWFor(heading);
+
 		Vector2D translation_meters = translation_steps.mul_by(metersPerStep);
 
 		position = position.add(translation_meters);
