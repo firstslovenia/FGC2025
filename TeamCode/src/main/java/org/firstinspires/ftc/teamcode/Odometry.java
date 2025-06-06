@@ -20,7 +20,7 @@ public class Odometry {
 	/// How many steps are needed (hopefully same for all motors) are needed to rotate the robot one full circle (2 Pi radians)
 	///
 	/// To measure this, try to rotate the robot exactly one whole circle (maybe: attach a laser pointer?)
-	static int magicStepsForTwoPi = 10;
+	static int magicStepsForTwoPi = 5008;
 	// --------------------
 
 	// Static values for calculating based off calibration values
@@ -64,7 +64,7 @@ public class Odometry {
 
 		// Vectors added together -> local translation
 		Vector2D translation_steps = front_side_steps.add(back_side_steps).add(right_fwd_steps).add(left_fwd_steps);
-		
+
 		// Account for our heading: local -> global
 		translation_steps = translation_steps.rotateCCWFor(heading);
 

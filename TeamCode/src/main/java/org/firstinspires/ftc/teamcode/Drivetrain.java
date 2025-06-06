@@ -11,10 +11,10 @@ public class Drivetrain {
 	Odometry odometry;
 
 	/// Whether or not to make translation field centric via our odometry heading
-	public boolean fieldCentricTranslation = false;
+	public boolean fieldCentricTranslation = true;
 
 	/// Whether or not to make rotation field centric - users input a target rotation on the rotation stick
-	public boolean fieldCentricRotation = false;
+	public boolean fieldCentricRotation = true;
 
 	public Drivetrain(LinearOpMode opMode, Hardware hw_map, Odometry odometry) {
 		callingOpmode = opMode;
@@ -129,8 +129,8 @@ public class Drivetrain {
 					needed_turn = needed_turn_other_way;
 				}
 
-				// Only turn if the needed turn is > 1 degree
-				double epsilon = Math.PI / 180;
+				// Only turn if the needed turn is > 5 degrees
+				double epsilon = (Math.PI / 180) * 5;
 
 				if (Math.abs(needed_turn) > epsilon) {
 					if (needed_turn > 0) {
