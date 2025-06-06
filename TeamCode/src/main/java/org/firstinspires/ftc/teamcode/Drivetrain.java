@@ -113,7 +113,23 @@ public class Drivetrain {
 			if (rotation_power > 0.3) {
 				double needed_turn = wanted_heading - odometry.heading;
 
-				// Only turn if the wanted turn is > 1 degree
+				// Check optimal direction
+				// If the difference > 0 -> counter clockwise
+				// If the difference < 0 -> clockwise
+				// We check if changing the direction (so changing the sign) makes for a small difference to travel
+				double needed_turn_other_way;
+
+				if (needed_turn < 0.0) {
+					needed_turn_other_way = needed_turn + 2 * Math.PI;
+				} else {
+					needed_turn_other_way = needed_turn - 2 * Math.PI;
+				}
+
+				if (Math.abs(needed_turn_other_way) < Math.abs(needed_turn)) {
+					needed_turn = needed_turn_other_way;
+				}
+
+				// Only turn if the needed turn is > 1 degree
 				double epsilon = Math.PI / 180;
 
 				if (Math.abs(needed_turn) > epsilon) {
