@@ -112,9 +112,7 @@ public class Drivetrain {
 		if (fieldCentricRotation) {
 			Pair<Double, Double> rotation_inputs = Drivetrain.getMagnitudeAndPhiFor(rotation_stick.x, rotation_stick.y);
 
-			// Gamepads like to give us both x and y between 0 and 1, meaning the length can be between 0 and sqrt(2)
-			double rotation_power = rotation_inputs.first / Math.sqrt(2);
-
+			double rotation_power = rotation_inputs.first;
 			double wanted_heading = rotation_inputs.second;
 
 			// Our heading has 0 as forward, not as to the right - adjust by 90 degrees
