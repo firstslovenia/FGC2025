@@ -10,6 +10,9 @@ public class Odometry {
 	LinearOpMode callingOpMode = null;
 	Hardware hardware;
 
+	/// Whether or not to debug values to telemetry
+	public boolean debug = true;
+
 	// Calibration values
 	// --------------------
 	/// How many steps (hopefully same for all motors) are needed to move the robot 1 meter forward
@@ -105,18 +108,21 @@ public class Odometry {
 
 		updateForStepDelta(frontSidewaysDelta, rightForwardDelta, leftForwardDelta, backSidewaysDelta);
 
-		callingOpMode.telemetry.addData("heading (rads)", heading);
-		callingOpMode.telemetry.addData("heading (deg)", Math.toDegrees(heading));
-		callingOpMode.telemetry.addData("position (x)", position.x);
-		callingOpMode.telemetry.addData("position (y)", position.x);
-		callingOpMode.telemetry.addData("n  front sideways", frontSidewaysPosition);
-		callingOpMode.telemetry.addData("n  back  sideways", backSidewaysPosition);
-		callingOpMode.telemetry.addData("n  right forward ", rightForwardPosition);
-		callingOpMode.telemetry.addData("n  left  forward ", leftForwardPosition);
-		callingOpMode.telemetry.addData("Δn front sideways", frontSidewaysDelta);
-		callingOpMode.telemetry.addData("Δn back  sideways", backSidewaysDelta);
-		callingOpMode.telemetry.addData("Δn right forward ", rightForwardDelta);
-		callingOpMode.telemetry.addData("Δn left  forward ", leftForwardDelta);
+		if (debug) {
+			callingOpMode.telemetry.addLine("-- Odometry --");
+			callingOpMode.telemetry.addData("heading (rads)", heading);
+			callingOpMode.telemetry.addData("heading (deg)", Math.toDegrees(heading));
+			callingOpMode.telemetry.addData("position (x)", position.x);
+			callingOpMode.telemetry.addData("position (y)", position.x);
+			callingOpMode.telemetry.addData("n  front sideways", frontSidewaysPosition);
+			callingOpMode.telemetry.addData("n  back  sideways", backSidewaysPosition);
+			callingOpMode.telemetry.addData("n  right forward ", rightForwardPosition);
+			callingOpMode.telemetry.addData("n  left  forward ", leftForwardPosition);
+			callingOpMode.telemetry.addData("Δn front sideways", frontSidewaysDelta);
+			callingOpMode.telemetry.addData("Δn back  sideways", backSidewaysDelta);
+			callingOpMode.telemetry.addData("Δn right forward ", rightForwardDelta);
+			callingOpMode.telemetry.addData("Δn left  forward ", leftForwardDelta);
+		}
 
 		lastFrontSidewaysPosition = frontSidewaysPosition;
 		lastBackSidewaysPosition = backSidewaysPosition;

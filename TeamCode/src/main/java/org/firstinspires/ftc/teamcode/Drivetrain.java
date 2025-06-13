@@ -6,9 +6,12 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 public class Drivetrain {
 
-	LinearOpMode callingOpmode;
+	LinearOpMode callingOpMode;
  	Hardware hardware;
 	Odometry odometry;
+
+	/// Whether or not to debug values to telemetry
+	public boolean debug = true;
 
 	/// Whether or not to make translation field centric via our odometry heading
 	public boolean fieldCentricTranslation = true;
@@ -16,8 +19,14 @@ public class Drivetrain {
 	/// Whether or not to make rotation field centric - users input a target rotation on the rotation stick
 	public boolean fieldCentricRotation = true;
 
+	/// Motor translation power multiplier
+	public double translationMultiplier = 1.0;
+
+	/// Motor rotation power multiplier
+	public double rotationMultiplier = 1.0;
+
 	public Drivetrain(LinearOpMode opMode, Hardware hw_map, Odometry odometry) {
-		callingOpmode = opMode;
+		callingOpMode = opMode;
 		hardware = hw_map;
 		this.odometry = odometry;
 	}
@@ -91,6 +100,8 @@ public class Drivetrain {
 			translation_direction = translation_direction - odometry.heading;
 		}
 
+		translation_power = translation_power * translationMultiplier;
+
 		translation_power = Math.min(translation_power, 1.0);
 		translation_power = Math.max(translation_power, 0.0);
 
@@ -147,6 +158,8 @@ public class Drivetrain {
 			clockwise_rotation_power = rotation_stick.x;
 		}
 
+		clockwise_rotation_power = clockwise_rotation_power * rotationMultiplier;
+
 		clockwise_rotation_power = Math.min(clockwise_rotation_power, 1.0);
 		clockwise_rotation_power = Math.max(clockwise_rotation_power, -1.0);
 
@@ -172,5 +185,20 @@ public class Drivetrain {
 		hardware.rightForwardMotor.setPower(rightForward);
 		hardware.frontSidewaysMotor.setPower(frontSideways);
 		hardware.backSidewaysMotor.setPower(backSideways);
+
+		if (debug) {
+			callingOpMode.telemetry.addLine("-- Drivetrain --");
+			callingOpMode.telemetry.addData("translation power     ", translation_power);
+			callingOpMode.telemetry.addData("translation local  dir", Math.toDegrees(translation_direction));
+
+			if (fieldCentricTranslation) {
+				callingOpMode.telemetry.addData("translation global dir",  Math.toDegrees(translation_inputs.second));
+			}
+
+			callingOpMode.telemetry.addData("Left  Forward motor power", leftForward);
+			callingOpMode.telemetry.addData("Right Forward motor power", rightForward);
+			callingOpMode.telemetry.addData("Front Sideways motor power", frontSideways);
+			callingOpMode.telemetry.addData("Back  Sideways motor power", backSideways);
+		}
 	}
 }

@@ -7,8 +7,8 @@ import org.firstinspires.ftc.teamcode.Hardware;
 import org.firstinspires.ftc.teamcode.Odometry;
 import org.firstinspires.ftc.teamcode.Vector2D;
 
-@TeleOp(name = "DrivetrainTest")
-public class DrivetrainTest extends LinearOpMode {
+@TeleOp(name = "Calibration")
+public class Calibration extends LinearOpMode {
 
 	Hardware hardware;
 	Drivetrain drivetrain;
@@ -23,8 +23,9 @@ public class DrivetrainTest extends LinearOpMode {
 		odometry = new Odometry(this, hardware);
 
 		drivetrain = new Drivetrain(this, hardware, odometry);
-		drivetrain.fieldCentricTranslation = true;
-		drivetrain.fieldCentricRotation = true;
+		drivetrain.rotationMultiplier = 0.5;
+		drivetrain.fieldCentricRotation = false;
+		drivetrain.fieldCentricTranslation = false;
 
 		waitForStart();
 
