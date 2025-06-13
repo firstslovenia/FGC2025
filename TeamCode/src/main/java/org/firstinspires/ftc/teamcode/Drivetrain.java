@@ -137,6 +137,13 @@ public class Drivetrain {
 					needed_turn = needed_turn_other_way;
 				}
 
+				if (debug) {
+					callingOpMode.telemetry.addLine("-- Field centric rotation --");
+					callingOpMode.telemetry.addData("wanted heading", Math.toDegrees(wanted_heading));
+					callingOpMode.telemetry.addData("needed turn", Math.toDegrees(needed_turn));
+					callingOpMode.telemetry.addData("needed turn (inverted)", Math.toDegrees(needed_turn_other_way));
+				}
+
 				// Only turn if the needed turn is > 5 degrees
 				double epsilon = (Math.PI / 180) * 5;
 
