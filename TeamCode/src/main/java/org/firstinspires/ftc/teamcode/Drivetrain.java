@@ -92,8 +92,7 @@ public class Drivetrain {
 
 		Pair<Double, Double> translation_inputs = Drivetrain.getMagnitudeAndPhiFor(translation_stick.x, translation_stick.y);
 
-		// Gamepads like to give us both x and y between 0 and 1, meaning the length can be between 0 and sqrt(2)
-		double translation_power = translation_inputs.first / Math.sqrt(2);
+		double translation_power = translation_inputs.first;
 		double translation_direction = translation_inputs.second;
 
 		if (fieldCentricTranslation) {
