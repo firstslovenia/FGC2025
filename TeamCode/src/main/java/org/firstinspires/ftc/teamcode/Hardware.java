@@ -1,8 +1,10 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.CompassSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.IMU;
 
 public class Hardware {
 
@@ -24,6 +26,8 @@ public class Hardware {
 	public static DcMotor leftForwardMotor = null;
 	public static DcMotor backSidewaysMotor = null;
 
+	public static IMU imu = null;
+
 	public Hardware (LinearOpMode opmode) {
 		callingOpMode = opmode;
 	}
@@ -38,5 +42,7 @@ public class Hardware {
 		// (This is assuming the motors spin clockwise and their directions are flipped once by gears)
 		frontSidewaysMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 		leftForwardMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+
+		imu = callingOpMode.hardwareMap.get(IMU.class, "imu");
 	}
 }

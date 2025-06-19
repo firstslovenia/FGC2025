@@ -4,11 +4,14 @@ import android.util.Pair;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+
 public class Drivetrain {
 
 	LinearOpMode callingOpMode;
  	Hardware hardware;
-	Odometry odometry;
 
 	/// Whether or not to debug values to telemetry
 	public boolean debug = true;
@@ -25,10 +28,32 @@ public class Drivetrain {
 	/// Motor rotation power multiplier
 	public double rotationMultiplier = 1.0;
 
-	public Drivetrain(LinearOpMode opMode, Hardware hw_map, Odometry odometry) {
+	public double rotation_koeficient_p = Math.PI / 7.0;
+	public double rotation_koeficient_i = Math.PI / 75.0;
+	public double rotation_koeficient_d = 0.0;
+	public double rotation_koeficient_f = 0.0;
+
+	public double rotation_error_integral = 0.0;
+	public double rotation_error_previous = 0.0;
+
+	public double rotation_error_previous_time = 0.0;
+
+	public Drivetrain(LinearOpMode opMode, Hardware hw_map) {
 		callingOpMode = opMode;
 		hardware = hw_map;
-		this.odometry = odometry;
+		resetStartingDirection();
+	}
+
+	/// Sets the starting direction to the current direction
+	public void resetStartingDirection() {
+		hardware.imu.resetYaw();
+	}
+
+	/// Returns how much we've turned (in radians) since the start
+	///
+	/// What our old odometry heading used to be
+	public double getHeadingDifferenceFromStart() {
+		return hardware.imu.getRobotOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.RADIANS).thirdAngle;
 	}
 
 	/// Computes (magnitude, phi) from x and y values of a joystick
@@ -96,7 +121,7 @@ public class Drivetrain {
 		double translation_direction = translation_inputs.second;
 
 		if (fieldCentricTranslation) {
-			translation_direction = translation_direction - odometry.heading;
+			translation_direction = translation_direction - getHeadingDifferenceFromStart();
 		}
 
 		translation_power = translation_power * translationMultiplier;
@@ -119,7 +144,7 @@ public class Drivetrain {
 			wanted_heading = wanted_heading - Math.PI / 2;
 
 			if (rotation_power > 0.3) {
-				double needed_turn = wanted_heading - odometry.heading;
+				double needed_turn = wanted_heading - getHeadingDifferenceFromStart();
 
 				// Check optimal direction
 				// If the difference > 0 -> counter clockwise
@@ -148,13 +173,33 @@ public class Drivetrain {
 				double epsilon = (Math.PI / 180) * 5;
 
 				if (Math.abs(needed_turn) > epsilon) {
-					if (needed_turn > 0) {
-						// Our turn direction needs to be positive, meaning counterclockwise
-						clockwise_rotation_power = -1.0;
-					} else {
-						// Our turn direction needs to be negative, meaning clockwise
-						clockwise_rotation_power = 1.0;
+
+					double rotation_error_derivative = (needed_turn - rotation_error_previous) / ((double) System.currentTimeMillis() - rotation_error_previous_time);
+
+					clockwise_rotation_power = (rotation_koeficient_p * needed_turn) + (rotation_koeficient_i * rotation_error_integral) + (rotation_koeficient_d * rotation_error_derivative) + rotation_koeficient_f;
+
+					// Our turn direction is flipped -> clockwise (our +) is mathematically negative and vice versa
+					clockwise_rotation_power *= -1.0;
+
+					if (debug) {
+						callingOpMode.telemetry.addData("proportional", needed_turn * rotation_koeficient_p);
+						callingOpMode.telemetry.addData("integral", rotation_error_integral * rotation_koeficient_i);
+						callingOpMode.telemetry.addData("derivative", rotation_error_derivative * rotation_koeficient_d);
+						callingOpMode.telemetry.addData("constant", rotation_koeficient_f);
 					}
+
+					rotation_error_previous = needed_turn;
+
+					if (rotation_error_previous_time != 0.0) {
+						rotation_error_integral += needed_turn * (((double) System.currentTimeMillis() - rotation_error_previous_time) / 1000.0);
+					}
+
+					rotation_error_previous_time = (double) System.currentTimeMillis();
+				}
+				else {
+					rotation_error_integral = 0.0;
+					rotation_error_previous = 0.0;
+					rotation_error_previous_time = 0.0;
 				}
 			}
 

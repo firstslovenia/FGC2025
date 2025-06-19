@@ -34,7 +34,7 @@ public class CalibrationValidator extends LinearOpMode {
 
 		odometry = new Odometry(this, hardware);
 
-		drivetrain = new Drivetrain(this, hardware, odometry);
+		drivetrain = new Drivetrain(this, hardware);
 		drivetrain.fieldCentricRotation = false;
 		drivetrain.rotationMultiplier = 0.5;
 

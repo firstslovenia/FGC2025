@@ -23,7 +23,7 @@ public class Odometry {
 	/// How many steps are needed (hopefully same for all motors) are needed to rotate the robot one full circle (2 Pi radians)
 	///
 	/// To measure this, try to rotate the robot exactly one whole circle (maybe: attach a laser pointer?)
-	static int magicStepsForTwoPi = 5008;
+	static int magicStepsForTwoPi = 4208;
 	// --------------------
 
 	// Static values for calculating based off calibration values

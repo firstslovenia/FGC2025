@@ -12,7 +12,6 @@ public class DrivetrainTest extends LinearOpMode {
 
 	Hardware hardware;
 	Drivetrain drivetrain;
-	Odometry odometry;
 
 	@Override
 	public void runOpMode() {
@@ -20,17 +19,15 @@ public class DrivetrainTest extends LinearOpMode {
 		hardware = new Hardware(this);
 		hardware.init();
 
-		odometry = new Odometry(this, hardware);
-
-		drivetrain = new Drivetrain(this, hardware, odometry);
+		drivetrain = new Drivetrain(this, hardware);
 		drivetrain.fieldCentricTranslation = true;
 		drivetrain.fieldCentricRotation = true;
+		drivetrain.resetStartingDirection();
 
 		waitForStart();
 
 		while (opModeIsActive()) {
 			drivetrain.update(new Vector2D(gamepad1.left_stick_x, gamepad1.left_stick_y), new Vector2D(gamepad1.right_stick_x, gamepad1.right_stick_y));
-			odometry.update();
 			telemetry.update();
 		}
 	}

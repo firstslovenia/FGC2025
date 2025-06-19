@@ -40,7 +40,7 @@ public class Calibration extends LinearOpMode {
 
 		odometry = new Odometry(this, hardware);
 
-		drivetrain = new Drivetrain(this, hardware, odometry);
+		drivetrain = new Drivetrain(this, hardware);
 		drivetrain.rotationMultiplier = 0.25;
 		drivetrain.fieldCentricRotation = false;
 		drivetrain.fieldCentricTranslation = false;
