@@ -2,11 +2,14 @@ package org.firstinspires.ftc.teamcode;
 
 import android.util.Pair;
 
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
 public class Drivetrain {
 
@@ -15,6 +18,7 @@ public class Drivetrain {
 
 	/// Whether or not to debug values to telemetry
 	public boolean debug = true;
+
 
 	/// Whether or not to make translation field centric via our odometry heading
 	public boolean fieldCentricTranslation = true;
@@ -28,15 +32,33 @@ public class Drivetrain {
 	/// Motor rotation power multiplier
 	public double rotationMultiplier = 1.0;
 
-	public double rotation_koeficient_p = Math.PI / 7.0;
-	public double rotation_koeficient_i = Math.PI / 75.0;
+
+	/// Coefficients for PIDF rotation control
+	public double rotation_koeficient_p = Math.PI / 6.50;
+	public double rotation_koeficient_i = Math.PI / 20.0;
 	public double rotation_koeficient_d = 0.0;
 	public double rotation_koeficient_f = 0.0;
 
-	public double rotation_error_integral = 0.0;
-	public double rotation_error_previous = 0.0;
 
-	public double rotation_error_previous_time = 0.0;
+	/// Internal values to keep track of for PIDF
+	double rotation_error_integral = 0.0;
+	double rotation_error_previous = 0.0;
+	double rotation_error_previous_time = 0.0;
+
+
+	/// Our heading difference from the last loop
+	double last_heading_difference_from_start = 0.0;
+	double last_heading_difference_from_start_time = 0.0;
+
+	/// Our rotational speed in radians per second
+	double angular_velocity_rad_per_s = 0.0;
+
+
+	/// The last robot orientation, saved so we can reset it if our readout becomes all zeroes
+	Orientation last_robot_orientation;
+
+	/// Saved so we don't try to reset the imu 1000x times a second
+	long last_imu_reset = 0;
 
 	public Drivetrain(LinearOpMode opMode, Hardware hw_map) {
 		callingOpMode = opMode;
@@ -53,7 +75,27 @@ public class Drivetrain {
 	///
 	/// What our old odometry heading used to be
 	public double getHeadingDifferenceFromStart() {
-		return hardware.imu.getRobotOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.RADIANS).thirdAngle;
+		if (isIMUOk()) {
+			return hardware.imu.getRobotOrientation(AxesReference.EXTRINSIC, AxesOrder.XYZ, AngleUnit.RADIANS).thirdAngle;
+		} else {
+			tryFixIMU();
+			return last_robot_orientation.thirdAngle;
+		}
+	}
+
+	/// Returns whether the IMU orientation sensors are working correctly
+	public boolean isIMUOk() {
+		Orientation orientation = hardware.imu.getRobotOrientation(AxesReference.EXTRINSIC, AxesOrder.XYZ, AngleUnit.RADIANS);
+
+		return orientation.thirdAngle != 0.0f;
+	}
+
+	/// Resets the IMU after we get BONKed
+	public void tryFixIMU() {
+		if ((System.currentTimeMillis() - last_imu_reset) > 1000) {
+			hardware.imu.initialize(new IMU.Parameters(new RevHubOrientationOnRobot(last_robot_orientation)));
+			last_imu_reset = System.currentTimeMillis();
+		}
 	}
 
 	/// Computes (magnitude, phi) from x and y values of a joystick
@@ -169,8 +211,8 @@ public class Drivetrain {
 					callingOpMode.telemetry.addData("needed turn (inverted)", Math.toDegrees(needed_turn_other_way));
 				}
 
-				// Only turn if the needed turn is > 5 degrees
-				double epsilon = (Math.PI / 180) * 5;
+				// Don't wobble wobble
+				double epsilon = Math.PI / 180;
 
 				if (Math.abs(needed_turn) > epsilon) {
 
@@ -235,6 +277,19 @@ public class Drivetrain {
 		hardware.frontSidewaysMotor.setPower(frontSideways);
 		hardware.backSidewaysMotor.setPower(backSideways);
 
+		if (last_heading_difference_from_start_time != 0) {
+			angular_velocity_rad_per_s = (getHeadingDifferenceFromStart() - last_heading_difference_from_start) / ((System.currentTimeMillis() - last_heading_difference_from_start_time) / 1000.0);
+		}
+
+		last_heading_difference_from_start = getHeadingDifferenceFromStart();
+		last_heading_difference_from_start_time = System.currentTimeMillis();
+
+		if (isIMUOk()) {
+			last_robot_orientation = hardware.imu.getRobotOrientation(AxesReference.EXTRINSIC, AxesOrder.XYZ, AngleUnit.RADIANS);
+		} else {
+			tryFixIMU();
+		}
+
 		if (debug) {
 			callingOpMode.telemetry.addLine("-- Drivetrain --");
 			callingOpMode.telemetry.addData("translation power     ", translation_power);
@@ -248,6 +303,11 @@ public class Drivetrain {
 			callingOpMode.telemetry.addData("Right Forward motor power", rightForward);
 			callingOpMode.telemetry.addData("Front Sideways motor power", frontSideways);
 			callingOpMode.telemetry.addData("Back  Sideways motor power", backSideways);
+
+			callingOpMode.telemetry.addData("heading difference", Math.toDegrees(getHeadingDifferenceFromStart()));
+			callingOpMode.telemetry.addData("Angular velocity (rad / s)", angular_velocity_rad_per_s);
+			callingOpMode.telemetry.addData("IMU ok", isIMUOk());
+			callingOpMode.telemetry.addData("Last IMU fix", last_imu_reset);
 		}
 	}
 }

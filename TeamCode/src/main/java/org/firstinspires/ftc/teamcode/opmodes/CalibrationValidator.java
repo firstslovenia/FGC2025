@@ -7,6 +7,9 @@ import org.firstinspires.ftc.teamcode.Hardware;
 import org.firstinspires.ftc.teamcode.Odometry;
 import org.firstinspires.ftc.teamcode.Vector2D;
 
+// Retrospective note: this doesn't properly work and should use PI(DF) control
+// Also, since we have an internal compass, we don't need to calibrate anything anymore
+
 /// Helps test if your odometry calibration is correct
 ///
 /// Should complete 10 (n) full turns and end on the same heading
