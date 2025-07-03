@@ -51,7 +51,7 @@ public class Drivetrain {
 	///
 	/// Pair.first is the heading difference in radians
 	/// Pair.last is System.currentTimeMillis at the time of the reading
-	SlidingWindow<Pair<Float, Long>> last_heading_differences = new SlidingWindow<>(10);
+	SlidingWindow<Pair<Float, Long>> last_heading_differences = new SlidingWindow<>(30);
 
 	/// Our rotational speed in radians per second
 	double angular_velocity_rad_per_s = 0.0;
@@ -206,7 +206,14 @@ public class Drivetrain {
 					needed_turn_other_way = needed_turn - 2 * Math.PI;
 				}
 
-				if (Math.abs(needed_turn_other_way) < Math.abs(needed_turn)) {
+				// Would it be faster to turn in the other direction?
+				boolean smaller_turn_other_way = Math.abs(needed_turn_other_way) < Math.abs(needed_turn);
+
+				// If we are already moving in the other direction pretty quickly, don't switch directions
+				boolean rotating_quickly = Math.abs(angular_velocity_rad_per_s) >= Math.PI / 2.0;
+				boolean rotating_quickly_other_way = rotating_quickly && ((angular_velocity_rad_per_s > 0.0 && needed_turn < 0.0) || (angular_velocity_rad_per_s < 0.0 && needed_turn > 0.0));
+
+				if (smaller_turn_other_way || rotating_quickly_other_way) {
 					needed_turn = needed_turn_other_way;
 				}
 
@@ -214,7 +221,9 @@ public class Drivetrain {
 					callingOpMode.telemetry.addLine("-- Field centric rotation --");
 					callingOpMode.telemetry.addData("wanted heading", Math.toDegrees(wanted_heading));
 					callingOpMode.telemetry.addData("needed turn", Math.toDegrees(needed_turn));
-					callingOpMode.telemetry.addData("needed turn (inverted)", Math.toDegrees(needed_turn_other_way));
+					callingOpMode.telemetry.addData("needed turn (other way)", Math.toDegrees(needed_turn_other_way));
+					callingOpMode.telemetry.addData("rotating quickly", rotating_quickly);
+					callingOpMode.telemetry.addData("rotating quickly (other way)", rotating_quickly_other_way);
 				}
 
 				// Don't wobble wobble

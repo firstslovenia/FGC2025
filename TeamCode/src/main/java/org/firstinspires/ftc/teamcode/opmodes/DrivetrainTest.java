@@ -31,6 +31,16 @@ public class DrivetrainTest extends LinearOpMode {
 				drivetrain.resetStartingDirection();
 			}
 
+			if (gamepad1.back) {
+				drivetrain.fieldCentricRotation = true;
+				drivetrain.fieldCentricTranslation = true;
+			}
+
+			if (gamepad1.start) {
+				drivetrain.fieldCentricRotation = false;
+				drivetrain.fieldCentricTranslation = false;
+			}
+
 			drivetrain.update(new Vector2D(gamepad1.left_stick_x, gamepad1.left_stick_y), new Vector2D(gamepad1.right_stick_x, gamepad1.right_stick_y));
 			telemetry.update();
 		}
