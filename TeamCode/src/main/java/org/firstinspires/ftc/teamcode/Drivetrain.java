@@ -158,18 +158,12 @@ public class Drivetrain {
 	/// Updates the drive motors based off a translation and rotation stick
 	public void update(Vector2D translation_stick, Vector2D rotation_stick) {
 
-		long t1 = System.currentTimeMillis();
-
 		// Save this, so we only call it once (6 ms!!!!) -> slightly expensive
 		Orientation current_orientation = hardware.imu.getRobotOrientation(AxesReference.EXTRINSIC, AxesOrder.XYZ, AngleUnit.RADIANS);
-
-		long t11 = System.currentTimeMillis();
 
 		float heading_difference_from_start = getHeadingDifferenceFromStart(current_orientation);
 
 		Pair<Double, Double> translation_inputs = Drivetrain.getMagnitudeAndPhiFor(translation_stick.x, translation_stick.y);
-
-		long t12 = System.currentTimeMillis();
 
 		double translation_power = translation_inputs.first;
 		double translation_direction = translation_inputs.second;
@@ -177,10 +171,6 @@ public class Drivetrain {
 		if (fieldCentricTranslation) {
 			translation_direction = translation_direction - heading_difference_from_start;
 		}
-
-		long t13 = System.currentTimeMillis();
-
-		long t2 = System.currentTimeMillis();
 
 		translation_power = translation_power * translationMultiplier;
 
@@ -191,8 +181,6 @@ public class Drivetrain {
 		//
 		// (-1 for max counterclockwise power)
 		double clockwise_rotation_power = 0.0;
-
-		long t3 = System.currentTimeMillis();
 
 		if (fieldCentricRotation) {
 			Pair<Double, Double> rotation_inputs = Drivetrain.getMagnitudeAndPhiFor(rotation_stick.x, rotation_stick.y);
@@ -267,8 +255,6 @@ public class Drivetrain {
 			clockwise_rotation_power = rotation_stick.x;
 		}
 
-		long t4 = System.currentTimeMillis();
-
 		clockwise_rotation_power = clockwise_rotation_power * rotationMultiplier;
 
 		clockwise_rotation_power = Math.min(clockwise_rotation_power, 1.0);
@@ -277,8 +263,6 @@ public class Drivetrain {
 		double sin_phi = Math.sin(translation_direction);
 		double cos_phi = Math.cos(translation_direction);
 
-		long t5 = System.currentTimeMillis();
-
 		double leftForward = (sin_phi * translation_power) + clockwise_rotation_power;
 		double rightForward = (sin_phi * translation_power) - clockwise_rotation_power;
 		double frontSideways = (cos_phi * translation_power) + clockwise_rotation_power;
@@ -286,8 +270,6 @@ public class Drivetrain {
 
 		// Normalize all of them to get the expected result
 		double maxPower = Math.max(Math.max(Math.abs(leftForward), Math.abs(rightForward)), Math.max(Math.abs(frontSideways), Math.abs(backSideways)));
-
-		long t6 = System.currentTimeMillis();
 
 		if (maxPower > 1.0) {
 			leftForward /= maxPower;
@@ -300,8 +282,6 @@ public class Drivetrain {
 		hardware.rightForwardMotor.setPower(rightForward);
 		hardware.frontSidewaysMotor.setPower(frontSideways);
 		hardware.backSidewaysMotor.setPower(backSideways);
-
-		long t7 = System.currentTimeMillis();
 
 		if (last_heading_differences.length() >= 2) {
 
@@ -316,15 +296,11 @@ public class Drivetrain {
 			callingOpMode.telemetry.addData("Last 10 loops took (ms)", delta_time_ms);
 		}
 
-		long t8 = System.currentTimeMillis();
-
 		// Not the most ideal - we could have turned in this time
 		float heading_diff = heading_difference_from_start;
 		long heading_diff_time = System.currentTimeMillis();
 
 		last_heading_differences.push(Pair.create(heading_diff, heading_diff_time));
-
-		long t81 = System.currentTimeMillis();
 
 		if (isIMUOk(current_orientation)) {
 			last_robot_orientation = current_orientation;
@@ -335,23 +311,7 @@ public class Drivetrain {
 			tryFixIMU();
 		}
 
-		long t9 = System.currentTimeMillis();
-
 		if (debug) {
-
-			callingOpMode.telemetry.addData("t2 - t1", t2 - t1);
-			callingOpMode.telemetry.addData("	t12 - t11", t13 - t12);
-			callingOpMode.telemetry.addData("	t12 - t11", t12 - t11);
-			callingOpMode.telemetry.addData("	t11 - t1", t11 - t1);
-			callingOpMode.telemetry.addData("t3 - t2", t3 - t2);
-			callingOpMode.telemetry.addData("t4 - t3", t4 - t3);
-			callingOpMode.telemetry.addData("t5 - t4", t5 - t4);
-			callingOpMode.telemetry.addData("t6 - t5", t6 - t5);
-			callingOpMode.telemetry.addData("t7 - t6", t7 - t6);
-			callingOpMode.telemetry.addData("t8 - t7", t8 - t7);
-			callingOpMode.telemetry.addData("t9 - t8", t9 - t8);
-			callingOpMode.telemetry.addData("	t9 - t81", t9 - t81);
-			callingOpMode.telemetry.addData("	t81 - t8", t81 - t8);
 
 			callingOpMode.telemetry.addLine("-- Drivetrain --");
 			callingOpMode.telemetry.addData("translation power     ", translation_power);
