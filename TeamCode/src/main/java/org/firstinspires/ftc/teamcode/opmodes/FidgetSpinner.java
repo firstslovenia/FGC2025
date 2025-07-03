@@ -4,8 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.*;
 
 import org.firstinspires.ftc.teamcode.Drivetrain;
 import org.firstinspires.ftc.teamcode.Hardware;
-import org.firstinspires.ftc.teamcode.Odometry;
-import org.firstinspires.ftc.teamcode.Vector2D;
+import org.firstinspires.ftc.teamcode.generic.Vector2D;
 
 @TeleOp(name = "Fidget Spinner")
 public class FidgetSpinner extends LinearOpMode {

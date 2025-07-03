@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.*;
 import org.firstinspires.ftc.teamcode.Drivetrain;
 import org.firstinspires.ftc.teamcode.Hardware;
 import org.firstinspires.ftc.teamcode.Odometry;
-import org.firstinspires.ftc.teamcode.Vector2D;
+import org.firstinspires.ftc.teamcode.generic.Vector2D;
 
 // Retrospective note: this doesn't properly work and should use PI(DF) control
 // Also, since we have an internal compass, we don't need to calibrate anything anymore

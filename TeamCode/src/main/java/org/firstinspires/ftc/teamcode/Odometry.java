@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import org.firstinspires.ftc.teamcode.generic.Vector2D;
+
 /// Implementation of odometry using only the drive motor encoders, assuming they don't slide
 ///
 /// This is used primary to keep track of our heading for field centric movement and rotation

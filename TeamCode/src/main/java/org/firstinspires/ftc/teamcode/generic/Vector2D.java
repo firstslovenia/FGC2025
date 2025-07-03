@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.generic;
 
 /// A 2D vector object with doubles for its components
 public class Vector2D {

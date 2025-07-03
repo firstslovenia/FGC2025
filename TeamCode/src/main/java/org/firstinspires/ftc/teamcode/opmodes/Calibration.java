@@ -5,7 +5,9 @@ import com.qualcomm.robotcore.eventloop.opmode.*;
 import org.firstinspires.ftc.teamcode.Drivetrain;
 import org.firstinspires.ftc.teamcode.Hardware;
 import org.firstinspires.ftc.teamcode.Odometry;
-import org.firstinspires.ftc.teamcode.Vector2D;
+import org.firstinspires.ftc.teamcode.generic.Vector2D;
+
+// Retrospective note: this is not needed anymore, we use the internal compass now
 
 /// Helps calibrate odometry (for field centric control)
 ///
