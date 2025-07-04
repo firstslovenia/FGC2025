@@ -26,6 +26,9 @@ public class Hardware {
 	public static DcMotor leftForwardMotor = null;
 	public static DcMotor backSidewaysMotor = null;
 
+	// Motors which turns our rope lifter
+	public static DcMotor lifterMotor1 = null;
+
 	public static IMU imu = null;
 
 	public Hardware (LinearOpMode opmode) {
@@ -42,6 +45,10 @@ public class Hardware {
 		// (This is assuming the motors spin clockwise and their directions are flipped once by gears)
 		frontSidewaysMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 		leftForwardMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+
+		lifterMotor1 = callingOpMode.hardwareMap.get(DcMotor.class, "lifter1");
+		// Lets not fall off the rope when we aren't actively climbing higher
+		lifterMotor1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
 		imu = callingOpMode.hardwareMap.get(IMU.class, "imu");
 	}

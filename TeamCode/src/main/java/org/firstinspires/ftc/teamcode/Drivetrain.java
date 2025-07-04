@@ -302,7 +302,7 @@ public class Drivetrain {
 
 			angular_velocity_rad_per_s = delta_heading / (delta_time_ms / 1000.0);
 
-			callingOpMode.telemetry.addData("Last 10 loops took (ms)", delta_time_ms);
+			callingOpMode.telemetry.addData("Last 30 loops took (ms)", delta_time_ms);
 		}
 
 		// Not the most ideal - we could have turned in this time

@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.*;
 
 import org.firstinspires.ftc.teamcode.Drivetrain;
 import org.firstinspires.ftc.teamcode.Hardware;
+import org.firstinspires.ftc.teamcode.Lifter;
 import org.firstinspires.ftc.teamcode.generic.Vector2D;
 
 @TeleOp(name = "DrivetrainTest")
@@ -11,6 +12,7 @@ public class DrivetrainTest extends LinearOpMode {
 
 	Hardware hardware;
 	Drivetrain drivetrain;
+	Lifter lifter;
 
 	@Override
 	public void runOpMode() {
@@ -23,9 +25,21 @@ public class DrivetrainTest extends LinearOpMode {
 		drivetrain.fieldCentricRotation = true;
 		drivetrain.resetStartingDirection();
 
+		lifter = new Lifter(this, hardware);
+
 		waitForStart();
 
 		while (opModeIsActive()) {
+
+			if (gamepad1.dpad_up) {
+				lifter.update(1.0);
+			}
+			else if (gamepad1.dpad_down) {
+				lifter.update(-1.0);
+			}
+			else {
+				lifter.update(0.0);
+			}
 
 			if (gamepad1.guide) {
 				drivetrain.resetStartingDirection();
