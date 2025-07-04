@@ -20,5 +20,6 @@ public class Lifter {
 		climb_up_power = Double.min(1.0, climb_up_power);
 
 		hardware.lifterMotor1.setPower(climb_up_power);
+		hardware.lifterMotor2.setPower(climb_up_power);
 	}
 }
