@@ -30,15 +30,7 @@ public class MainOpmode extends LinearOpMode {
 
 		while (opModeIsActive()) {
 
-			if (gamepad1.dpad_up) {
-				lifter.update(1.0);
-			}
-			else if (gamepad1.dpad_down) {
-				lifter.update(-1.0);
-			}
-			else {
-				lifter.update(0.0);
-			}
+			lifter.update((double) gamepad2.right_stick_y);
 
 			if (gamepad1.guide) {
 				drivetrain.resetStartingDirection();

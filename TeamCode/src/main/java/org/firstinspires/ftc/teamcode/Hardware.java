@@ -50,7 +50,7 @@ public class Hardware {
 		lifterMotor1 = callingOpMode.hardwareMap.get(DcMotor.class, "lifter1");
 		lifterMotor2 = callingOpMode.hardwareMap.get(DcMotor.class, "lifter2");
 
-		lifterMotor2.setDirection(DcMotorSimple.Direction.REVERSE);
+		lifterMotor1.setDirection(DcMotorSimple.Direction.REVERSE);
 
 		// Lets not fall off the rope when we aren't actively climbing higher
 		lifterMotor1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
