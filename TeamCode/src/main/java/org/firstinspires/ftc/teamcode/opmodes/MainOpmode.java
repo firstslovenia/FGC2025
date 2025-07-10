@@ -1,14 +1,13 @@
 package org.firstinspires.ftc.teamcode.opmodes;
 
 import com.qualcomm.robotcore.eventloop.opmode.*;
-
 import org.firstinspires.ftc.teamcode.Drivetrain;
 import org.firstinspires.ftc.teamcode.Hardware;
 import org.firstinspires.ftc.teamcode.Lifter;
 import org.firstinspires.ftc.teamcode.generic.Vector2D;
 
-@TeleOp(name = "DrivetrainTest")
-public class DrivetrainTest extends LinearOpMode {
+@TeleOp(name = "Main")
+public class MainOpmode extends LinearOpMode {
 
 	Hardware hardware;
 	Drivetrain drivetrain;

@@ -305,7 +305,6 @@ public class Drivetrain {
 			callingOpMode.telemetry.addData("Last 30 loops took (ms)", delta_time_ms);
 		}
 
-		// Not the most ideal - we could have turned in this time
 		float heading_diff = heading_difference_from_start;
 		long heading_diff_time = System.currentTimeMillis();
 
