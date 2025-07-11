@@ -69,10 +69,10 @@ public class MainOpmode extends LinearOpMode {
 			if (gamepad1.dpad_up || gamepad1.dpad_down || gamepad1.dpad_left || gamepad1.dpad_right) {
 				translation_vector = new Vector2D(0.0, 0.0);
 
-				if (gamepad1.dpad_up) { translation_vector.y += 1.0; }
-				if (gamepad1.dpad_down) { translation_vector.y -= 1.0; }
-				if (gamepad1.dpad_right) { translation_vector.x += 1.0; }
-				if (gamepad1.dpad_left) { translation_vector.x -= 1.0; }
+				if (gamepad1.dpad_up) { translation_vector.y += 0.65; }
+				if (gamepad1.dpad_down) { translation_vector.y -= 0.65; }
+				if (gamepad1.dpad_right) { translation_vector.x += 0.65; }
+				if (gamepad1.dpad_left) { translation_vector.x -= 0.65; }
 			}
 
 			drivetrain.update(translation_vector, new Vector2D(gamepad1.right_stick_x, gamepad1.right_stick_y));
