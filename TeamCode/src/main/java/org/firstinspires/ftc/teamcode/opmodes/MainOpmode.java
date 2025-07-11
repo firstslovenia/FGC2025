@@ -30,7 +30,17 @@ public class MainOpmode extends LinearOpMode {
 
 		while (opModeIsActive()) {
 
-			lifter.update((double) gamepad2.right_stick_y);
+			double lifter_power = gamepad1.right_trigger + -gamepad1.left_trigger;
+
+			if (gamepad1.left_bumper) {
+				lifter_power -= 0.5;
+			}
+
+			if (gamepad1.right_bumper) {
+				lifter_power += 0.5;
+			}
+
+			lifter.update(lifter_power);
 
 			if (gamepad1.guide) {
 				drivetrain.resetStartingDirection();
@@ -46,7 +56,26 @@ public class MainOpmode extends LinearOpMode {
 				drivetrain.fieldCentricTranslation = false;
 			}
 
-			drivetrain.update(new Vector2D(gamepad1.left_stick_x, gamepad1.left_stick_y), new Vector2D(gamepad1.right_stick_x, gamepad1.right_stick_y));
+			if (gamepad1.x) {
+				drivetrain.keepHeading = true;
+			}
+
+			if (gamepad1.y) {
+				drivetrain.keepHeading = false;
+			}
+
+			Vector2D translation_vector = new Vector2D(gamepad1.left_stick_x, gamepad1.left_stick_y);
+
+			if (gamepad1.dpad_up || gamepad1.dpad_down || gamepad1.dpad_left || gamepad1.dpad_right) {
+				translation_vector = new Vector2D(0.0, 0.0);
+
+				if (gamepad1.dpad_up) { translation_vector.y += 1.0; }
+				if (gamepad1.dpad_down) { translation_vector.y -= 1.0; }
+				if (gamepad1.dpad_right) { translation_vector.x += 1.0; }
+				if (gamepad1.dpad_left) { translation_vector.x -= 1.0; }
+			}
+
+			drivetrain.update(translation_vector, new Vector2D(gamepad1.right_stick_x, gamepad1.right_stick_y));
 			telemetry.update();
 		}
 	}

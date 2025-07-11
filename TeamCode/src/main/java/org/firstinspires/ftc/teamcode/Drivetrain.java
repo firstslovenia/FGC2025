@@ -48,7 +48,7 @@ public class Drivetrain {
 	/// In radians
 	///
 	/// By default, this is forward (Pi / 2)
-	double wanted_heading = Math.PI / 2;
+	public double wanted_heading = Math.PI / 2;
 
 	/// The last robot orientation, saved so we can reset it if our readout becomes all zeroes
 	Orientation last_robot_orientation;
@@ -59,12 +59,13 @@ public class Drivetrain {
 	public Drivetrain(LinearOpMode opMode, Hardware hw_map) {
 		callingOpMode = opMode;
 		hardware = hw_map;
-		rotation_pid_controller = new GenericPIDController(callingOpMode, 0.8, 0.0, 0.0, 0.0);
+		rotation_pid_controller = new GenericPIDController(callingOpMode, 0.8, 0.16, 0.0, 0.0);
 		resetStartingDirection();
 	}
 
 	/// Sets the starting direction to the current direction
 	public void resetStartingDirection() {
+		wanted_heading = Math.PI / 2;
 		hardware.imu.resetYaw();
 	}
 
@@ -125,11 +126,17 @@ public class Drivetrain {
 	/// add our current heading for field-centric movement
 	///
 	public static Pair<Double, Double> getMagnitudeAndPhiFor(double x, double y) {
-		double tan = Double.POSITIVE_INFINITY;
 
-		if (x != 0.0) {
-			tan = y / x;
+		if (x == 0.0) {
+			if (y >= 0.0) {
+				return new Pair<>(y, Math.PI / 2.0);
+			}
+			else {
+				return new Pair<>(-y, - Math.PI / 2.0);
+			}
 		}
+
+		double tan = y / x;
 
 		// This is between - PI / 2 and PI / 2
 		double phi = Math.atan(tan);
