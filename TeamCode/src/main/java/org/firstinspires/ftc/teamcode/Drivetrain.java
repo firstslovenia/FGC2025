@@ -36,7 +36,7 @@ public class Drivetrain {
 	/// Motor rotation power multiplier
 	public double rotationMultiplier = 1.0;
 
-	/// PID implementation for our rotation
+	/// PID implementation for our rotation motors
 	GenericPIDController rotation_pid_controller;
 
 	/// Our rotational speed in radians per second
@@ -58,7 +58,7 @@ public class Drivetrain {
 	public Drivetrain(LinearOpMode opMode, Hardware hw_map) {
 		callingOpMode = opMode;
 		hardware = hw_map;
-		rotation_pid_controller = new GenericPIDController(callingOpMode);
+		rotation_pid_controller = new GenericPIDController(callingOpMode, 0.8, 0.0, 0.0, 0.0);
 		resetStartingDirection();
 	}
 

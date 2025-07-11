@@ -9,36 +9,41 @@ import java.util.Optional;
 /// A generic PID controller controlled with setting and reading fields
 public class GenericPIDController extends PIDController {
 
-	GenericPIDController(LinearOpMode opMode) {
+	GenericPIDController(LinearOpMode opMode, double p, double i, double d, double f) {
 		this.callingOpMode = Optional.of(opMode);
 		this.telemetry_prefix = "";
 		this.debug = true;
 	}
 
-	GenericPIDController(LinearOpMode opMode, String telemetry_prefix) {
+	GenericPIDController(LinearOpMode opMode, String telemetry_prefix, double p, double i, double d, double f) {
 		this.callingOpMode = Optional.of(opMode);
 		this.telemetry_prefix = telemetry_prefix;
 		this.debug = true;
 	}
 
+	double p_coefficient = 0.0;
+	double i_coefficient = 0.0;
+	double d_coefficient = 0.0;
+	double f_coefficient = 0.0;
+
 	/// Our proportional (k_p * e) coefficient
 	public double get_coefficient_p() {
-		return 0.8;
+		return p_coefficient;
 	}
 
 	/// Our integral (k_i * integral e dt) coefficient
 	public double get_coefficient_i() {
-		return 0.0;
+		return i_coefficient;
 	}
 
 	/// Our derivative (k_d * de/dt) coefficient
 	public double get_coefficient_d() {
-		return 0.0;
+		return d_coefficient;
 	}
 
 	/// Our feed-forward (+ k_f) coefficient
 	public double get_coefficient_f() {
-		return 0.0;
+		return f_coefficient;
 	}
 
 	/// Our manually set epsilon / error value
