@@ -6,12 +6,18 @@ import org.firstinspires.ftc.teamcode.generic.PIDController;
 
 import java.util.Optional;
 
-/// A PID controller for our drivetrain's field-centric rotation
-public class RotationPIDController extends PIDController {
+/// A generic PID controller controlled with setting and reading fields
+public class GenericPIDController extends PIDController {
 
-	RotationPIDController(LinearOpMode opMode) {
+	GenericPIDController(LinearOpMode opMode) {
 		this.callingOpMode = Optional.of(opMode);
 		this.telemetry_prefix = "";
+		this.debug = true;
+	}
+
+	GenericPIDController(LinearOpMode opMode, String telemetry_prefix) {
+		this.callingOpMode = Optional.of(opMode);
+		this.telemetry_prefix = telemetry_prefix;
 		this.debug = true;
 	}
 
@@ -35,21 +41,19 @@ public class RotationPIDController extends PIDController {
 		return 0.0;
 	}
 
-	/// Our manually set epsilon value in radians - how far we are from our wanted rotation
-	///
-	/// a negative value denotes the other way, and should result in a negative output
-	public double needed_turn = 0.0;
+	/// Our manually set epsilon / error value
+	public double error = 0.0;
 
 	/// The last loop's output control value
-	public double power_output = 0.0;
+	public double output = 0.0;
 
 	/// Our output control function, should e.g. set a motor's power
 	public void output(double value) {
-		power_output = value;
+		output = value;
 	}
 
 	/// Our function which tells us how far we are from the target value
 	public double epsilon() {
-		return needed_turn;
+		return error;
 	}
 }

@@ -27,6 +27,9 @@ public class Drivetrain {
 	/// Whether or not to make rotation field centric - users input a target rotation on the rotation stick
 	public boolean fieldCentricRotation = true;
 
+	/// Whether or not to try to keep the heading (i. e. to always rotate towards wanted_heading, even if we aren't pressing the stick)
+	public boolean keepHeading = true;
+
 	/// Motor translation power multiplier
 	public double translationMultiplier = 1.0;
 
@@ -34,11 +37,17 @@ public class Drivetrain {
 	public double rotationMultiplier = 1.0;
 
 	/// PID implementation for our rotation
-	RotationPIDController rotation_pid_controller;
+	GenericPIDController rotation_pid_controller;
 
 	/// Our rotational speed in radians per second
 	double angular_velocity_rad_per_s = 0.0;
 
+	/// What absolute heading we want to turn towards, if any
+	///
+	/// In radians
+	///
+	/// By default, this is forward (Pi / 2)
+	double wanted_heading = Math.PI / 2;
 
 	/// The last robot orientation, saved so we can reset it if our readout becomes all zeroes
 	Orientation last_robot_orientation;
@@ -49,7 +58,7 @@ public class Drivetrain {
 	public Drivetrain(LinearOpMode opMode, Hardware hw_map) {
 		callingOpMode = opMode;
 		hardware = hw_map;
-		rotation_pid_controller = new RotationPIDController(callingOpMode);
+		rotation_pid_controller = new GenericPIDController(callingOpMode);
 		resetStartingDirection();
 	}
 
@@ -168,16 +177,30 @@ public class Drivetrain {
 		double clockwise_rotation_power = 0.0;
 
 		if (fieldCentricRotation) {
+
 			Pair<Double, Double> rotation_inputs = Drivetrain.getMagnitudeAndPhiFor(rotation_stick.x, rotation_stick.y);
 
-			double rotation_power = rotation_inputs.first;
-			double wanted_heading = rotation_inputs.second;
+			double rotation_power_input = rotation_inputs.first;
+			double wanted_heading_input = rotation_inputs.second;
 
-			// Our heading has 0 as forward, not as to the right - adjust by 90 degrees
-			wanted_heading = wanted_heading - Math.PI / 2;
+			// Whether or not we'll actively try to rotate this loop
+			//
+			// This is true if either:
+			// - we have a rotational input we want to go towards
+			// - we want to always keep our heading
+			boolean should_rotate = keepHeading;
 
-			if (rotation_power > 0.3) {
-				double needed_turn = wanted_heading - heading_difference_from_start;
+			if (rotation_power_input > 0.3) {
+				wanted_heading = wanted_heading_input;
+				should_rotate = true;
+			}
+
+			if (should_rotate) {
+
+				// Our heading has 0 as forward, not as to the right - adjust by 90 degrees
+				double wanted_heading_local = wanted_heading - Math.PI / 2;
+
+				double needed_turn = wanted_heading_local - heading_difference_from_start;
 
 				// Check optimal direction
 				// If the difference > 0 -> counter clockwise
@@ -210,16 +233,17 @@ public class Drivetrain {
 
 				if (Math.abs(needed_turn) > minimum) {
 
-					rotation_pid_controller.needed_turn = needed_turn;
+					rotation_pid_controller.error = needed_turn;
 					rotation_pid_controller.update();
-					clockwise_rotation_power = rotation_pid_controller.power_output;
+					clockwise_rotation_power = rotation_pid_controller.output;
 
 					// Our turn direction is flipped -> clockwise (our +) is mathematically negative and vice versa
 					clockwise_rotation_power *= -1.0;
-				}
-				else {
+				} else {
 					rotation_pid_controller.reset();
 				}
+			} else {
+				rotation_pid_controller.reset();
 			}
 
 		} else {
