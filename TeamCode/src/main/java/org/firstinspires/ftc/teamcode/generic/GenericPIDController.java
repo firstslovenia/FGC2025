@@ -1,24 +1,30 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.generic;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-
-import org.firstinspires.ftc.teamcode.generic.PIDController;
 
 import java.util.Optional;
 
 /// A generic PID controller controlled with setting and reading fields
 public class GenericPIDController extends PIDController {
 
-	GenericPIDController(LinearOpMode opMode, double p, double i, double d, double f) {
+	public GenericPIDController(LinearOpMode opMode, double p, double i, double d, double f) {
 		this.callingOpMode = Optional.of(opMode);
 		this.telemetry_prefix = "";
 		this.debug = true;
+		this.p_coefficient = p;
+		this.i_coefficient = i;
+		this.d_coefficient = d;
+		this.f_coefficient = f;
 	}
 
-	GenericPIDController(LinearOpMode opMode, String telemetry_prefix, double p, double i, double d, double f) {
+	public GenericPIDController(LinearOpMode opMode, String telemetry_prefix, double p, double i, double d, double f) {
 		this.callingOpMode = Optional.of(opMode);
 		this.telemetry_prefix = telemetry_prefix;
 		this.debug = true;
+		this.p_coefficient = p;
+		this.i_coefficient = i;
+		this.d_coefficient = d;
+		this.f_coefficient = f;
 	}
 
 	double p_coefficient = 0.0;
