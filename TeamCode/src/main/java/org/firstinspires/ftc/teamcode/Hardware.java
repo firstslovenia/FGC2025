@@ -42,6 +42,11 @@ public class Hardware {
 		leftForwardMotor = callingOpMode.hardwareMap.get(DcMotor.class, "leftForward");
 		backSidewaysMotor = callingOpMode.hardwareMap.get(DcMotor.class, "backSideways");
 
+		frontSidewaysMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+		rightForwardMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+		leftForwardMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+		backSidewaysMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+
 		// Make the positive direction on motor (+x, +y) --> up and to the right, like a cartesian coordinate system
 		// (This is assuming the motors spin clockwise and their directions are flipped once by gears)
 		frontSidewaysMotor.setDirection(DcMotorSimple.Direction.REVERSE);

@@ -10,7 +10,6 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
-import org.firstinspires.ftc.teamcode.generic.SlidingWindow;
 import org.firstinspires.ftc.teamcode.generic.Vector2D;
 
 public class Drivetrain {
@@ -34,24 +33,8 @@ public class Drivetrain {
 	/// Motor rotation power multiplier
 	public double rotationMultiplier = 1.0;
 
-
-	/// Coefficients for PIDF rotation control
-	public double rotation_koeficient_p = Math.PI / 6.50;
-	public double rotation_koeficient_i = Math.PI / 20.0;
-	public double rotation_koeficient_d = 0.0;
-	public double rotation_koeficient_f = 0.0;
-
-
-	/// Internal values to keep track of for PIDF
-	double rotation_error_integral = 0.0;
-	double rotation_error_previous = 0.0;
-	long rotation_error_previous_time = 0;
-
-	/// A sliding window of the last 10 readings of the heading difference
-	///
-	/// Pair.first is the heading difference in radians
-	/// Pair.last is System.currentTimeMillis at the time of the reading
-	SlidingWindow<Pair<Float, Long>> last_heading_differences = new SlidingWindow<>(30);
+	/// PID implementation for our rotation
+	RotationPIDController rotation_pid_controller;
 
 	/// Our rotational speed in radians per second
 	double angular_velocity_rad_per_s = 0.0;
@@ -66,6 +49,7 @@ public class Drivetrain {
 	public Drivetrain(LinearOpMode opMode, Hardware hw_map) {
 		callingOpMode = opMode;
 		hardware = hw_map;
+		rotation_pid_controller = new RotationPIDController(callingOpMode);
 		resetStartingDirection();
 	}
 
@@ -160,6 +144,7 @@ public class Drivetrain {
 
 		// Save this, so we only call it once (6 ms!!!!) -> slightly expensive
 		Orientation current_orientation = hardware.imu.getRobotOrientation(AxesReference.EXTRINSIC, AxesOrder.XYZ, AngleUnit.RADIANS);
+		angular_velocity_rad_per_s = hardware.imu.getRobotAngularVelocity(AngleUnit.RADIANS).zRotationRate;
 
 		float heading_difference_from_start = getHeadingDifferenceFromStart(current_orientation);
 
@@ -209,11 +194,7 @@ public class Drivetrain {
 				// Would it be faster to turn in the other direction?
 				boolean smaller_turn_other_way = Math.abs(needed_turn_other_way) < Math.abs(needed_turn);
 
-				// If we are already moving in the other direction pretty quickly, don't switch directions
-				boolean rotating_quickly = Math.abs(angular_velocity_rad_per_s) >= Math.PI / 2.0;
-				boolean rotating_quickly_other_way = rotating_quickly && ((angular_velocity_rad_per_s > 0.0 && needed_turn < 0.0) || (angular_velocity_rad_per_s < 0.0 && needed_turn > 0.0));
-
-				if (smaller_turn_other_way || rotating_quickly_other_way) {
+				if (smaller_turn_other_way) {
 					needed_turn = needed_turn_other_way;
 				}
 
@@ -222,41 +203,22 @@ public class Drivetrain {
 					callingOpMode.telemetry.addData("wanted heading", Math.toDegrees(wanted_heading));
 					callingOpMode.telemetry.addData("needed turn", Math.toDegrees(needed_turn));
 					callingOpMode.telemetry.addData("needed turn (other way)", Math.toDegrees(needed_turn_other_way));
-					callingOpMode.telemetry.addData("rotating quickly", rotating_quickly);
-					callingOpMode.telemetry.addData("rotating quickly (other way)", rotating_quickly_other_way);
 				}
 
 				// Don't wobble wobble
-				double epsilon = Math.PI / 180;
+				double minimum = Math.PI / 180;
 
-				if (Math.abs(needed_turn) > epsilon) {
+				if (Math.abs(needed_turn) > minimum) {
 
-					double rotation_error_derivative = (needed_turn - rotation_error_previous) / (((double) System.currentTimeMillis() - rotation_error_previous_time) / 1000.0);
-
-					clockwise_rotation_power = (rotation_koeficient_p * needed_turn) + (rotation_koeficient_i * rotation_error_integral) + (rotation_koeficient_d * rotation_error_derivative) + rotation_koeficient_f;
+					rotation_pid_controller.needed_turn = needed_turn;
+					rotation_pid_controller.update();
+					clockwise_rotation_power = rotation_pid_controller.power_output;
 
 					// Our turn direction is flipped -> clockwise (our +) is mathematically negative and vice versa
 					clockwise_rotation_power *= -1.0;
-
-					if (debug) {
-						callingOpMode.telemetry.addData("proportional", needed_turn * rotation_koeficient_p);
-						callingOpMode.telemetry.addData("integral", rotation_error_integral * rotation_koeficient_i);
-						callingOpMode.telemetry.addData("derivative", rotation_error_derivative * rotation_koeficient_d);
-						callingOpMode.telemetry.addData("constant", rotation_koeficient_f);
-					}
-
-					rotation_error_previous = needed_turn;
-
-					if (rotation_error_previous_time != 0.0) {
-						rotation_error_integral += needed_turn * ((double) (System.currentTimeMillis() - rotation_error_previous_time) / 1000.0);
-					}
-
-					rotation_error_previous_time = System.currentTimeMillis();
 				}
 				else {
-					rotation_error_integral = 0.0;
-					rotation_error_previous = 0.0;
-					rotation_error_previous_time = 0;
+					rotation_pid_controller.reset();
 				}
 			}
 
@@ -292,29 +254,8 @@ public class Drivetrain {
 		hardware.frontSidewaysMotor.setPower(frontSideways);
 		hardware.backSidewaysMotor.setPower(backSideways);
 
-		if (last_heading_differences.length() >= 2) {
-
-			Pair<Float, Long> first = last_heading_differences.first().get();
-			Pair<Float, Long> last = last_heading_differences.last().get();
-
-			double delta_heading = last.first - first.first;
-			double delta_time_ms = last.second - first.second;
-
-			angular_velocity_rad_per_s = delta_heading / (delta_time_ms / 1000.0);
-
-			callingOpMode.telemetry.addData("Last 30 loops took (ms)", delta_time_ms);
-		}
-
-		float heading_diff = heading_difference_from_start;
-		long heading_diff_time = System.currentTimeMillis();
-
-		last_heading_differences.push(Pair.create(heading_diff, heading_diff_time));
-
 		if (isIMUOk(current_orientation)) {
 			last_robot_orientation = current_orientation;
-
-			// This is an expensive call - only do it once
-			//last_robot_orientation = hardware.imu.getRobotOrientation(AxesReference.EXTRINSIC, AxesOrder.XYZ, AngleUnit.RADIANS);
 		} else {
 			tryFixIMU();
 		}
@@ -334,7 +275,7 @@ public class Drivetrain {
 			callingOpMode.telemetry.addData("Front Sideways motor power", frontSideways);
 			callingOpMode.telemetry.addData("Back  Sideways motor power", backSideways);
 
-			callingOpMode.telemetry.addData("heading difference", Math.toDegrees(heading_diff));
+			callingOpMode.telemetry.addData("heading difference", Math.toDegrees(heading_difference_from_start));
 			callingOpMode.telemetry.addData("Angular velocity (rad / s)", angular_velocity_rad_per_s);
 			callingOpMode.telemetry.addData("IMU ok", isIMUOk(current_orientation));
 			callingOpMode.telemetry.addData("Last IMU fix", last_imu_reset);
