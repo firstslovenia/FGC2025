@@ -11,6 +11,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.teamcode.generic.GenericPIDController;
+import org.firstinspires.ftc.teamcode.generic.SlidingWindow;
 import org.firstinspires.ftc.teamcode.generic.Vector2D;
 
 public class Drivetrain {
@@ -43,12 +44,12 @@ public class Drivetrain {
 	/// Our rotational speed in radians per second
 	double angular_velocity_rad_per_s = 0.0;
 
-	/// What absolute heading we want to turn towards, if any
+	/// A sliding window of what absolute heading we want to turn towards
 	///
 	/// In radians
 	///
 	/// By default, this is forward (Pi / 2)
-	public double wanted_heading = Math.PI / 2;
+	public SlidingWindow<Double> last_wanted_headings = new SlidingWindow<>(10, Math.PI / 2.0);
 
 	/// The last robot orientation, saved so we can reset it if our readout becomes all zeroes
 	Orientation last_robot_orientation;
@@ -65,7 +66,7 @@ public class Drivetrain {
 
 	/// Sets the starting direction to the current direction
 	public void resetStartingDirection() {
-		wanted_heading = Math.PI / 2;
+		last_wanted_headings = new SlidingWindow(10, Math.PI / 2.0);
 		hardware.imu.resetYaw();
 	}
 
@@ -199,11 +200,13 @@ public class Drivetrain {
 			boolean should_rotate = keepHeading;
 
 			if (rotation_power_input > 0.3) {
-				wanted_heading = wanted_heading_input;
+				last_wanted_headings.push(wanted_heading_input);
 				should_rotate = true;
 			}
 
 			if (should_rotate) {
+
+				double wanted_heading = last_wanted_headings.average().orElse(Math.PI / 2);
 
 				// Our heading has 0 as forward, not as to the right - adjust by 90 degrees
 				double wanted_heading_local = wanted_heading - Math.PI / 2;

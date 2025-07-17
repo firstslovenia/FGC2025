@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.CompassSensor;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.IMU;
@@ -29,6 +29,12 @@ public class Hardware {
 	// Motors which turns our rope lifter
 	public static DcMotor lifterMotor1 = null;
 	public static DcMotor lifterMotor2 = null;
+
+	// Arms lower / higher servo
+	public static CRServo armHeightServo = null;
+
+	// Arms open / closed
+	public static CRServo armOpenClosedServo = null;
 
 	public static IMU imu = null;
 
@@ -60,6 +66,9 @@ public class Hardware {
 		// Lets not fall off the rope when we aren't actively climbing higher
 		lifterMotor1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 		lifterMotor2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+		armHeightServo = callingOpMode.hardwareMap.get(CRServo.class, "armHeightServo");
+		armOpenClosedServo = callingOpMode.hardwareMap.get(CRServo.class, "armOpenClosedServo");
 
 		imu = callingOpMode.hardwareMap.get(IMU.class, "imu");
 	}

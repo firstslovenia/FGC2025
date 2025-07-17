@@ -8,10 +8,17 @@ import java.util.Optional;
 /// Pushing one to the end (when it is full) removes the first one and moves all other elements over.
 ///
 /// Useful for averaging a reading or calculating a rate of change for a slightly larger delta t
-public class SlidingWindow<T> {
+public class SlidingWindow<T extends Number> {
 	ArrayList<T> values;
 
 	int size;
+
+	/// Creates the window with the provided size and a starting value
+	public SlidingWindow(int window_size, T first_value) {
+		size = window_size;
+		values = new ArrayList<T>(window_size);
+		values.add(first_value);
+	}
 
 	/// Creates the window with the provided size
 	public SlidingWindow(int window_size) {
@@ -50,5 +57,37 @@ public class SlidingWindow<T> {
 		}
 
 		return Optional.of(values.get(values.size() - 1));
+	}
+
+	/// Returns the sum of all elements in the window
+	public Optional<Double> sum() {
+		if (values.isEmpty()) {
+			Optional.empty();
+		}
+
+		double sum = 0.0;
+
+		for (int i = 0; i < values.size(); i++) {
+			sum = sum + values.get(i).doubleValue();
+		}
+
+		return Optional.of(sum);
+	}
+
+	/// Returns the average of all elements in the window
+	public Optional<Double> average() {
+		if (values.isEmpty()) {
+			Optional.empty();
+		}
+
+		double average = 0.0;
+
+		for (int i = 0; i < values.size(); i++) {
+			average = average + values.get(i).doubleValue();
+		}
+
+		average = average / (double) values.size();
+
+		return Optional.of(average);
 	}
 }

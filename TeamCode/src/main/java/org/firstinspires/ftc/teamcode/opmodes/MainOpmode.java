@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.opmodes;
 
 import com.qualcomm.robotcore.eventloop.opmode.*;
+
+import org.firstinspires.ftc.teamcode.Arms;
 import org.firstinspires.ftc.teamcode.Drivetrain;
 import org.firstinspires.ftc.teamcode.Hardware;
 import org.firstinspires.ftc.teamcode.Lifter;
@@ -12,6 +14,7 @@ public class MainOpmode extends LinearOpMode {
 	Hardware hardware;
 	Drivetrain drivetrain;
 	Lifter lifter;
+	Arms arms;
 
 	@Override
 	public void runOpMode() {
@@ -25,6 +28,8 @@ public class MainOpmode extends LinearOpMode {
 		drivetrain.resetStartingDirection();
 
 		lifter = new Lifter(this, hardware);
+
+		arms = new Arms(this, hardware);
 
 		waitForStart();
 
@@ -41,6 +46,30 @@ public class MainOpmode extends LinearOpMode {
 			}
 
 			lifter.update(lifter_power);
+
+			double arms_vertical_power = 0.0;
+
+			if (gamepad2.a) {
+				arms_vertical_power -= 1.0;
+			}
+
+			if (gamepad2.b) {
+				arms_vertical_power += 1.0;
+			}
+
+			arms.update_up_down(arms_vertical_power);
+
+			double arms_horizontal_power = 0.0;
+
+			if (gamepad2.x) {
+				arms_horizontal_power -= 1.0;
+			}
+
+			if (gamepad2.y) {
+				arms_horizontal_power += 1.0;
+			}
+
+			arms.update_open_closed(arms_horizontal_power);
 
 			if (gamepad1.guide) {
 				drivetrain.resetStartingDirection();
