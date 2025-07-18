@@ -28,5 +28,6 @@ public class Arms {
 		servo_power = Double.min(1.0, servo_power);
 
 		hardware.armOpenClosedServo.setPower(servo_power);
+		hardware.armOpenClosedServo2.setPower(servo_power);
 	}
 }

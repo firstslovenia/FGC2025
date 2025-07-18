@@ -35,13 +35,13 @@ public class MainOpmode extends LinearOpMode {
 
 		while (opModeIsActive()) {
 
-			double lifter_power = gamepad1.right_trigger + -gamepad1.left_trigger;
+			double lifter_power = gamepad2.right_trigger + -gamepad2.left_trigger;
 
-			if (gamepad1.left_bumper) {
+			if (gamepad2.left_bumper) {
 				lifter_power -= 0.5;
 			}
 
-			if (gamepad1.right_bumper) {
+			if (gamepad2.right_bumper) {
 				lifter_power += 0.5;
 			}
 

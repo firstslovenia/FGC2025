@@ -35,6 +35,7 @@ public class Hardware {
 
 	// Arms open / closed
 	public static CRServo armOpenClosedServo = null;
+	public static CRServo armOpenClosedServo2 = null;
 
 	public static IMU imu = null;
 
@@ -69,6 +70,9 @@ public class Hardware {
 
 		armHeightServo = callingOpMode.hardwareMap.get(CRServo.class, "armHeightServo");
 		armOpenClosedServo = callingOpMode.hardwareMap.get(CRServo.class, "armOpenClosedServo");
+
+		armOpenClosedServo2 = callingOpMode.hardwareMap.get(CRServo.class, "armOpenClosedServo2");
+		armOpenClosedServo2.setDirection(DcMotorSimple.Direction.REVERSE);
 
 		imu = callingOpMode.hardwareMap.get(IMU.class, "imu");
 	}
