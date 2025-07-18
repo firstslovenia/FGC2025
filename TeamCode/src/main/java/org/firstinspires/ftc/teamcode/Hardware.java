@@ -69,6 +69,8 @@ public class Hardware {
 		lifterMotor2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
 		armHeightServo = callingOpMode.hardwareMap.get(CRServo.class, "armHeightServo");
+		armHeightServo.setDirection(DcMotorSimple.Direction.REVERSE);
+
 		armOpenClosedServo = callingOpMode.hardwareMap.get(CRServo.class, "armOpenClosedServo");
 
 		armOpenClosedServo2 = callingOpMode.hardwareMap.get(CRServo.class, "armOpenClosedServo2");

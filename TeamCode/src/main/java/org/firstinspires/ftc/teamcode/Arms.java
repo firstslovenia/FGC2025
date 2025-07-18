@@ -22,6 +22,18 @@ public class Arms {
 		hardware.armHeightServo.setPower(servo_power);
 	}
 
+	public void update_open_closed(Double left_servo_power, Double right_servo_power) {
+
+		left_servo_power = Double.max(-1.0, left_servo_power);
+		left_servo_power = Double.min(1.0, left_servo_power);
+
+		right_servo_power = Double.max(-1.0, right_servo_power);
+		right_servo_power = Double.min(1.0, right_servo_power);
+
+		hardware.armOpenClosedServo.setPower(left_servo_power);
+		hardware.armOpenClosedServo2.setPower(right_servo_power);
+	}
+
 	public void update_open_closed(Double servo_power) {
 
 		servo_power = Double.max(-1.0, servo_power);

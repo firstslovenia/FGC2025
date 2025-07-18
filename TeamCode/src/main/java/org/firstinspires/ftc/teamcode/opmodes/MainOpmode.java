@@ -53,7 +53,7 @@ public class MainOpmode extends LinearOpMode {
 				arms_vertical_power -= 1.0;
 			}
 
-			if (gamepad2.b) {
+			if (gamepad2.y) {
 				arms_vertical_power += 1.0;
 			}
 
@@ -61,15 +61,21 @@ public class MainOpmode extends LinearOpMode {
 
 			double arms_horizontal_power = 0.0;
 
-			if (gamepad2.x) {
+			if (gamepad2.b) {
 				arms_horizontal_power -= 1.0;
 			}
 
-			if (gamepad2.y) {
+			if (gamepad2.x) {
 				arms_horizontal_power += 1.0;
 			}
 
-			arms.update_open_closed(arms_horizontal_power);
+			if (gamepad2.dpad_left) {
+				arms.update_open_closed(arms_horizontal_power, 0.0);
+			} else if (gamepad2.dpad_right) {
+				arms.update_open_closed(0.0, arms_horizontal_power);
+			} else {
+				arms.update_open_closed(arms_horizontal_power);
+			}
 
 			if (gamepad1.guide) {
 				drivetrain.resetStartingDirection();
