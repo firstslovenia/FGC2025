@@ -22,7 +22,6 @@ public class Drivetrain {
 	/// Whether or not to debug values to telemetry
 	public boolean debug = true;
 
-
 	/// Whether or not to make translation field centric via our odometry heading
 	public boolean fieldCentricTranslation = true;
 
@@ -60,7 +59,7 @@ public class Drivetrain {
 	public Drivetrain(LinearOpMode opMode, Hardware hw_map) {
 		callingOpMode = opMode;
 		hardware = hw_map;
-		rotation_pid_controller = new GenericPIDController(callingOpMode, 0.8, 0.16, 0.0, 0.0);
+		rotation_pid_controller = new GenericPIDController(callingOpMode, 0.7, 0.0, 0.15, 0.2);
 		resetStartingDirection();
 	}
 
@@ -202,6 +201,8 @@ public class Drivetrain {
 			if (rotation_power_input > 0.3) {
 				last_wanted_headings.push(wanted_heading_input);
 				should_rotate = true;
+			} else {
+				last_wanted_headings.push(last_wanted_headings.last().get());
 			}
 
 			if (should_rotate) {
@@ -232,6 +233,22 @@ public class Drivetrain {
 					needed_turn = needed_turn_other_way;
 				}
 
+				// Note: this practically didn't work how we wanted it to, and caused other problems.
+
+				// Check for rotating quickly, if we want to switch directions stop first
+				/*boolean rotating_quickly = Math.abs(angular_velocity_rad_per_s) >= Math.PI;
+
+				boolean rotating_quickly_other_way = rotating_quickly && ((angular_velocity_rad_per_s > 0.0 && needed_turn < 0.0) || (angular_velocity_rad_per_s < 0.0 && needed_turn > 0.0)) && Math.abs(needed_turn) >= Math.PI / 4;
+
+				// Stop first
+				if (rotating_quickly_other_way) {
+					clockwise_rotation_power = 0.0;
+					needed_turn = 0.0;
+
+					// Don't average stuff out now
+					last_wanted_headings = new SlidingWindow(10, last_wanted_headings.last().get());
+				}*/
+
 				if (debug) {
 					callingOpMode.telemetry.addLine("-- Field centric rotation --");
 					callingOpMode.telemetry.addData("wanted heading", Math.toDegrees(wanted_heading));
@@ -240,7 +257,7 @@ public class Drivetrain {
 				}
 
 				// Don't wobble wobble
-				double minimum = Math.PI / 180;
+				double minimum = (Math.PI / 180.0) * 2.0;
 
 				if (Math.abs(needed_turn) > minimum) {
 

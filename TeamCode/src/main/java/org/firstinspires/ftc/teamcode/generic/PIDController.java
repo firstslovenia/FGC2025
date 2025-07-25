@@ -58,8 +58,8 @@ public abstract class PIDController {
 			return;
 		}
 
-		double delta_time = System.currentTimeMillis() - previous_epsilon_time;
-		epsilon_integral = delta_time * epsilon();
+		double delta_time = (System.currentTimeMillis() - previous_epsilon_time) / 1000.0;
+		epsilon_integral += delta_time * epsilon();
 	}
 
 	/// Calculates d epsilon / dt, if we have the previous value
@@ -68,7 +68,7 @@ public abstract class PIDController {
 			return Optional.empty();
 		}
 
-		double delta_time = System.currentTimeMillis() - previous_epsilon_time;
+		double delta_time = (System.currentTimeMillis() - previous_epsilon_time) / 1000.0;
 		double delta_epsilon = epsilon() - previous_epsilon;
 
 		return Optional.of(delta_epsilon / delta_time);
@@ -88,6 +88,16 @@ public abstract class PIDController {
 		double i = get_coefficient_i() * epsilon_integral;
 		double d = get_coefficient_d() * calculate_derivative().orElse(0.0);
 		double f = get_coefficient_f();
+
+		// Compensate for derivate jumping randomly (2 PI -> 0)
+		if (Math.abs(d) > 1.0) {
+			d = 0.0;
+		}
+
+		// Make feed-forward go the same way as proportional
+		if (p < 0.0) {
+			f = -f;
+		}
 
 		if (callingOpMode.isPresent() && debug) {
 
