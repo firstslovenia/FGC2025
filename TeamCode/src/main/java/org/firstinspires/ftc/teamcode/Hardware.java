@@ -72,9 +72,9 @@ public class Hardware {
 		armHeightServo.setDirection(DcMotorSimple.Direction.REVERSE);
 
 		armOpenClosedServo = callingOpMode.hardwareMap.get(CRServo.class, "armOpenClosedServo");
+		armOpenClosedServo.setDirection(DcMotorSimple.Direction.REVERSE);
 
 		armOpenClosedServo2 = callingOpMode.hardwareMap.get(CRServo.class, "armOpenClosedServo2");
-		armOpenClosedServo2.setDirection(DcMotorSimple.Direction.REVERSE);
 
 		imu = callingOpMode.hardwareMap.get(IMU.class, "imu");
 	}

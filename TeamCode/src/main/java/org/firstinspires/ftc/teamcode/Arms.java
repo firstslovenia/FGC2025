@@ -14,6 +14,8 @@ public class Arms {
 		hardware = hw_map;
 	}
 
+	// Positive power -> up
+	// Negative power -> down
 	public void update_up_down(Double servo_power) {
 
 		servo_power = Double.max(-1.0, servo_power);
@@ -22,6 +24,8 @@ public class Arms {
 		hardware.armHeightServo.setPower(servo_power);
 	}
 
+	// Positive power -> open
+	// Negative power -> close
 	public void update_open_closed(Double left_servo_power, Double right_servo_power) {
 
 		left_servo_power = Double.max(-1.0, left_servo_power);
@@ -34,6 +38,8 @@ public class Arms {
 		hardware.armOpenClosedServo2.setPower(right_servo_power);
 	}
 
+	// Positive power -> open
+	// Negative power -> close
 	public void update_open_closed(Double servo_power) {
 
 		servo_power = Double.max(-1.0, servo_power);

@@ -62,11 +62,11 @@ public class MainOpmode extends LinearOpMode {
 			double arms_horizontal_power = 0.0;
 
 			if (gamepad2.b) {
-				arms_horizontal_power -= 1.0;
+				arms_horizontal_power += 1.0;
 			}
 
 			if (gamepad2.x) {
-				arms_horizontal_power += 1.0;
+				arms_horizontal_power -= 1.0;
 			}
 
 			if (gamepad2.dpad_left) {
@@ -86,7 +86,8 @@ public class MainOpmode extends LinearOpMode {
 				drivetrain.fieldCentricTranslation = true;
 			}
 
-			if (gamepad1.start) {
+			// Don't do that when we're binding controllers
+			if (gamepad1.start && !gamepad1.a && !gamepad1.b) {
 				drivetrain.fieldCentricRotation = false;
 				drivetrain.fieldCentricTranslation = false;
 			}

@@ -43,12 +43,12 @@ public class Drivetrain {
 	/// Our rotational speed in radians per second
 	double angular_velocity_rad_per_s = 0.0;
 
-	/// A sliding window of what absolute heading we want to turn towards
+	/// What absolute heading we want to turn towards
 	///
 	/// In radians
 	///
 	/// By default, this is forward (Pi / 2)
-	public SlidingWindow<Double> last_wanted_headings = new SlidingWindow<>(10, Math.PI / 2.0);
+	public  double wanted_heading = Math.PI / 2.0;
 
 	/// The last robot orientation, saved so we can reset it if our readout becomes all zeroes
 	Orientation last_robot_orientation;
@@ -65,7 +65,7 @@ public class Drivetrain {
 
 	/// Sets the starting direction to the current direction
 	public void resetStartingDirection() {
-		last_wanted_headings = new SlidingWindow(10, Math.PI / 2.0);
+		wanted_heading = Math.PI / 2.0;
 		hardware.imu.resetYaw();
 	}
 
@@ -199,15 +199,11 @@ public class Drivetrain {
 			boolean should_rotate = keepHeading;
 
 			if (rotation_power_input > 0.3) {
-				last_wanted_headings.push(wanted_heading_input);
+				wanted_heading = wanted_heading_input;
 				should_rotate = true;
-			} else {
-				last_wanted_headings.push(last_wanted_headings.last().get());
 			}
 
 			if (should_rotate) {
-
-				double wanted_heading = last_wanted_headings.average().orElse(Math.PI / 2);
 
 				// Our heading has 0 as forward, not as to the right - adjust by 90 degrees
 				double wanted_heading_local = wanted_heading - Math.PI / 2;
