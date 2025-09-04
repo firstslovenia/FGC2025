@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
 
 /// Our lifter logic.
 ///
@@ -9,9 +10,26 @@ public class Lifter {
 	LinearOpMode callingOpMode;
 	Hardware hardware;
 
+	/// Whether the lifter is ready to operate. If false, we need to call initialize first.
+	public boolean ready = false;
+
 	public Lifter(LinearOpMode opMode, Hardware hw_map) {
 		callingOpMode = opMode;
 		hardware = hw_map;
+	}
+
+	/// Called to enable the motors, setup what we need to be able to use the lifter
+	public void initialize() {
+		hardware.lifterMotor1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+		hardware.lifterMotor1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+		ready = true;
+	}
+
+	/// Called to undo initialize
+	public void uninitialize() {
+		hardware.lifterMotor1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+		hardware.lifterMotor1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+		ready = false;
 	}
 
 	public void update(Double climb_up_power) {

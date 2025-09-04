@@ -32,6 +32,7 @@ public class Hardware {
 
 	// Arms lower / higher servo
 	public static CRServo armHeightServo = null;
+	public static CRServo armHeightServo2 = null;
 
 	// Arms open / closed
 	public static CRServo armOpenClosedServo = null;
@@ -64,12 +65,10 @@ public class Hardware {
 
 		lifterMotor2.setDirection(DcMotorSimple.Direction.REVERSE);
 
-		// Lets not fall off the rope when we aren't actively climbing higher
-		lifterMotor1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-		lifterMotor2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
 		armHeightServo = callingOpMode.hardwareMap.get(CRServo.class, "armHeightServo");
 		armHeightServo.setDirection(DcMotorSimple.Direction.REVERSE);
+
+		armHeightServo2 = callingOpMode.hardwareMap.get(CRServo.class, "armHeightServo2");
 
 		armOpenClosedServo = callingOpMode.hardwareMap.get(CRServo.class, "armOpenClosedServo");
 		armOpenClosedServo.setDirection(DcMotorSimple.Direction.REVERSE);

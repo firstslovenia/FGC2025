@@ -4,6 +4,7 @@ import android.util.Pair;
 
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -11,7 +12,6 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.teamcode.generic.GenericPIDController;
-import org.firstinspires.ftc.teamcode.generic.SlidingWindow;
 import org.firstinspires.ftc.teamcode.generic.Vector2D;
 
 public class Drivetrain {
@@ -37,6 +37,14 @@ public class Drivetrain {
 	/// Motor rotation power multiplier
 	public double rotationMultiplier = 1.0;
 
+	/// What motor power to consider not actually moving
+	///
+	/// 2025/09/04 - our motors need to be 0.5 to actually cause **any** movement! For rotation about 0.25 for all motors
+	public double power_epsilon = 0.15;
+
+	/// How many ms to wait before releasing the breaks after not moving
+	public long stop_breaking_after_ms = 1000;
+
 	/// PID implementation for our rotation motors
 	GenericPIDController rotation_pid_controller;
 
@@ -54,7 +62,10 @@ public class Drivetrain {
 	Orientation last_robot_orientation;
 
 	/// Saved so we don't try to reset the imu 1000x times a second
-	long last_imu_reset = 0;
+	public long last_imu_reset_time = 0;
+
+	/// The millis time when we stopped moving
+	public long stopped_moving_time = 0;
 
 	public Drivetrain(LinearOpMode opMode, Hardware hw_map) {
 		callingOpMode = opMode;
@@ -88,9 +99,9 @@ public class Drivetrain {
 
 	/// Resets the IMU after we get BONKed
 	public void tryFixIMU() {
-		if ((System.currentTimeMillis() - last_imu_reset) > 1000) {
+		if ((System.currentTimeMillis() - last_imu_reset_time) > 1000) {
 			hardware.imu.initialize(new IMU.Parameters(new RevHubOrientationOnRobot(last_robot_orientation)));
-			last_imu_reset = System.currentTimeMillis();
+			last_imu_reset_time = System.currentTimeMillis();
 		}
 	}
 
@@ -297,10 +308,42 @@ public class Drivetrain {
 			backSideways /= maxPower;
 		}
 
+		if (Math.abs(leftForward) < power_epsilon) leftForward = 0.0;
+		if (Math.abs(rightForward) < power_epsilon) rightForward = 0.0;
+		if (Math.abs(frontSideways) < power_epsilon) frontSideways = 0.0;
+		if (Math.abs(backSideways) < power_epsilon) backSideways = 0.0;
+
 		hardware.leftForwardMotor.setPower(leftForward);
 		hardware.rightForwardMotor.setPower(rightForward);
 		hardware.frontSidewaysMotor.setPower(frontSideways);
 		hardware.backSidewaysMotor.setPower(backSideways);
+
+		// Disable breaking if we don't need it
+		boolean not_moving =
+			leftForward == 0 &&
+			rightForward == 0 &&
+			frontSideways == 0 &&
+			backSideways == 0;
+
+		if (not_moving) {
+			if (stopped_moving_time == 0) {
+				stopped_moving_time = System.currentTimeMillis();
+			}
+		} else {
+			stopped_moving_time = 0;
+		}
+
+		if (not_moving && System.currentTimeMillis() - stopped_moving_time > stop_breaking_after_ms) {
+			hardware.leftForwardMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+			hardware.rightForwardMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+			hardware.frontSidewaysMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+			hardware.backSidewaysMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+		} else {
+			hardware.leftForwardMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+			hardware.rightForwardMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+			hardware.frontSidewaysMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+			hardware.backSidewaysMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+		}
 
 		if (isIMUOk(current_orientation)) {
 			last_robot_orientation = current_orientation;
@@ -311,6 +354,8 @@ public class Drivetrain {
 		if (debug) {
 
 			callingOpMode.telemetry.addLine("-- Drivetrain --");
+			callingOpMode.telemetry.addData("stoppped_time         ", stopped_moving_time);
+			callingOpMode.telemetry.addData("breaking?             ", hardware.frontSidewaysMotor.getZeroPowerBehavior() == DcMotor.ZeroPowerBehavior.BRAKE);
 			callingOpMode.telemetry.addData("translation power     ", translation_power);
 			callingOpMode.telemetry.addData("translation local  dir", Math.toDegrees(translation_direction));
 
@@ -326,7 +371,7 @@ public class Drivetrain {
 			callingOpMode.telemetry.addData("heading difference", Math.toDegrees(heading_difference_from_start));
 			callingOpMode.telemetry.addData("Angular velocity (rad / s)", angular_velocity_rad_per_s);
 			callingOpMode.telemetry.addData("IMU ok", isIMUOk(current_orientation));
-			callingOpMode.telemetry.addData("Last IMU fix", last_imu_reset);
+			callingOpMode.telemetry.addData("Last IMU fix", last_imu_reset_time);
 		}
 	}
 }
