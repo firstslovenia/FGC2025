@@ -3,11 +3,9 @@ package org.firstinspires.ftc.teamcode.opmodes.main;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.Arms;
-import org.firstinspires.ftc.teamcode.Drivetrain;
 import org.firstinspires.ftc.teamcode.Hardware;
 import org.firstinspires.ftc.teamcode.Lifter;
 import org.firstinspires.ftc.teamcode.generic.State;
-import org.firstinspires.ftc.teamcode.generic.Vector2D;
 
 public class ClimbState implements State {
 	Hardware hardware;
