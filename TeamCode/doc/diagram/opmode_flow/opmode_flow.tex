@@ -4,6 +4,7 @@
 \date{September 2025}
 
 \usepackage{tikz}
+\usepackage[top=1cm, bottom=1cm, right=1cm, left=1cm]{geometry}
 \usetikzlibrary{shapes.geometric, arrows}
 \usetikzlibrary{positioning}
 
@@ -16,7 +17,7 @@
 \begin{document}
 \resizebox{!}{\textheight}{%
 \begin{tikzpicture}[node distance=1cm]
-	\node (start) [startstop] {Start};
+	\node at (0, 0) (start) [startstop] {Start};
 	\node (create_init_hardware) [process, below=of start] {Initialize hardware components};
 	\node (populate_state_map) [process, below=of create_init_hardware] {Create and populate state map};
 	\node (wait_for_start) [process, below=of populate_state_map] {waitForStart()};
