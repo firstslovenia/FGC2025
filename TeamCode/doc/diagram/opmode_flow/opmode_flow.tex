@@ -14,7 +14,7 @@
 \tikzstyle{arrow} = [thick,->,>=latex]
 
 \begin{document}
-\resizebox{!}{20cm}{%
+\resizebox{!}{\textheight}{%
 \begin{tikzpicture}[node distance=1cm]
 	\node (start) [startstop] {Start};
 	\node (create_init_hardware) [process, below=of start] {Initialize hardware components};
@@ -31,10 +31,7 @@
 	\node (current_state_loop) [process, below=of set_next_active] {active\_state.loop()};
 	\node (stop) [startstop, below=of current_state_loop, yshift=-2.0cm] {Stop};
 
-	\draw [arrow] (start) -> (create_init_hardware);
-	\draw [arrow] (create_init_hardware) -> (populate_state_map);
-	\draw [arrow] (populate_state_map) -> (wait_for_start);
-	\draw [arrow] (wait_for_start) -> (while_opmode_running);
+	\draw [arrow] (start) -> (create_init_hardware) -> (populate_state_map) -> (wait_for_start) -> (while_opmode_running);
 
 	\draw [arrow] (while_opmode_running) -> node[anchor=east] {yes} (is_next_state_just_pressed);
 	\draw [arrow] (while_opmode_running) -- node[anchor=south] {no} ++(12cm, 0) |- (stop);
@@ -47,10 +44,7 @@
 	\draw [arrow] (is_previous_state_just_pressed) -> node[anchor=east] {yes} (determine_next_state_prev);
 	\draw [arrow] (is_previous_state_just_pressed) -- node[anchor=south] {no} ++(-10cm, 0) |- (current_state_loop);
 
-	\draw [arrow] (determine_next_state_prev) -> (current_on_switch_to);
-	\draw [arrow] (current_on_switch_to) -> (next_on_switch_from);
-	\draw [arrow] (next_on_switch_from) -> (set_next_active);
-	\draw [arrow] (set_next_active) -> (current_state_loop);
+	\draw [arrow] (determine_next_state_prev) -> (current_on_switch_to) -> (next_on_switch_from) -> (set_next_active) -> (current_state_loop);
 
 	\draw [arrow] (current_state_loop) |- ++(-14.0cm, -2.0cm) {} |- (while_opmode_running);
 
