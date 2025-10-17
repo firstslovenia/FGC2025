@@ -187,6 +187,11 @@ public class Drivetrain {
 
 	/// Updates the drive motors based off a translation and rotation stick
 	public void update(Vector2D translation_stick, Vector2D rotation_stick) {
+		update(translation_stick, rotation_stick, false);
+	}
+
+	/// Updates the drive motors based off a translation and rotation stick; if override_field_centric_translation is set to true, translates robot-centric
+	public void update(Vector2D translation_stick, Vector2D rotation_stick, boolean override_field_centric_translation) {
 
 		// Save this, so we only call it once (6 ms!!!!) -> slightly expensive
 		Orientation current_orientation = hardware.imu.getRobotOrientation(AxesReference.EXTRINSIC, AxesOrder.XYZ, AngleUnit.RADIANS);
@@ -207,7 +212,7 @@ public class Drivetrain {
 		double translation_power = translation_inputs.first;
 		double translation_direction = translation_inputs.second;
 
-		if (fieldCentricTranslation) {
+		if (fieldCentricTranslation && !override_field_centric_translation) {
 			translation_direction = translation_direction - heading_difference_from_start;
 		}
 
@@ -271,28 +276,12 @@ public class Drivetrain {
 					needed_turn = needed_turn_other_way;
 				}
 
-				// Note: this practically didn't work how we wanted it to, and caused other problems.
-
-				// Check for rotating quickly, if we want to switch directions stop first
-				/*boolean rotating_quickly = Math.abs(angular_velocity_rad_per_s) >= Math.PI;
-
-				boolean rotating_quickly_other_way = rotating_quickly && ((angular_velocity_rad_per_s > 0.0 && needed_turn < 0.0) || (angular_velocity_rad_per_s < 0.0 && needed_turn > 0.0)) && Math.abs(needed_turn) >= Math.PI / 4;
-
-				// Stop first
-				if (rotating_quickly_other_way) {
-					clockwise_rotation_power = 0.0;
-					needed_turn = 0.0;
-
-					// Don't average stuff out now
-					last_wanted_headings = new SlidingWindow(10, last_wanted_headings.last().get());
-				}*/
-
-				if (debug) {
+				/*if (debug) {
 					callingOpMode.telemetry.addLine("-- Rotational PIDF --");
 					callingOpMode.telemetry.addData("wanted heading", Math.toDegrees(wanted_heading));
 					callingOpMode.telemetry.addData("needed turn", Math.toDegrees(needed_turn));
 					callingOpMode.telemetry.addData("needed turn (other way)", Math.toDegrees(needed_turn_other_way));
-				}
+				}*/
 
 				// Don't wobble wobble
 				double minimum = (Math.PI / 180.0) * 2.0;
@@ -389,10 +378,12 @@ public class Drivetrain {
 			tryFixIMU();
 		}
 
-		if (debug) {
+		callingOpMode.telemetry.addLine("-- Drivetrain --");
+		callingOpMode.telemetry.addData("field centric rotation", fieldCentricRotation);
+		callingOpMode.telemetry.addData("heading correction    ", keepHeading);
+		callingOpMode.telemetry.addLine("");
 
-			callingOpMode.telemetry.addLine("-- Drivetrain --");
-			callingOpMode.telemetry.addData("field centric rotation", fieldCentricRotation);
+		if (debug) {
 			callingOpMode.telemetry.addData("stoppped_time         ", stopped_moving_time);
 			callingOpMode.telemetry.addData("breaking?             ", hardware.frontSidewaysMotor.getZeroPowerBehavior() == DcMotor.ZeroPowerBehavior.BRAKE);
 			callingOpMode.telemetry.addData("translation power     ", translation_power);

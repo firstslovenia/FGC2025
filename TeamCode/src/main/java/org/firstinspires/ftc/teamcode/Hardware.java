@@ -27,16 +27,16 @@ public class Hardware {
 	public static DcMotor backSidewaysMotor = null;
 
 	// Motors which turns our rope lifter
-	public static DcMotor lifterMotor1 = null;
-	public static DcMotor lifterMotor2 = null;
+	public static DcMotor lifterMotorLeft = null;
+	public static DcMotor lifterMotorRight = null;
 
 	// Arms lower / higher servo
-	public static CRServo armHeightServo = null;
-	public static CRServo armHeightServo2 = null;
+	public static CRServo armHeightServoLeft = null;
+	public static CRServo armHeightServoRight = null;
 
 	// Arms open / closed
-	public static CRServo armOpenClosedServo = null;
-	public static CRServo armOpenClosedServo2 = null;
+	public static CRServo armOpenClosedServoLeft = null;
+	public static CRServo armOpenClosedServoRight = null;
 
 	public static IMU imu = null;
 
@@ -60,20 +60,20 @@ public class Hardware {
 		frontSidewaysMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 		leftForwardMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
-		lifterMotor1 = callingOpMode.hardwareMap.get(DcMotor.class, "lifterLeft");
-		lifterMotor2 = callingOpMode.hardwareMap.get(DcMotor.class, "lifterRight");
+		lifterMotorLeft = callingOpMode.hardwareMap.get(DcMotor.class, "lifterLeft");
+		lifterMotorRight = callingOpMode.hardwareMap.get(DcMotor.class, "lifterRight");
 
-		lifterMotor2.setDirection(DcMotorSimple.Direction.REVERSE);
+		lifterMotorRight.setDirection(DcMotorSimple.Direction.REVERSE);
 
-		armHeightServo = callingOpMode.hardwareMap.get(CRServo.class, "armHeightServoLeft");
-		armHeightServo2 = callingOpMode.hardwareMap.get(CRServo.class, "armHeightServoRight");
+		armHeightServoLeft = callingOpMode.hardwareMap.get(CRServo.class, "armHeightServoLeft");
+		armHeightServoRight = callingOpMode.hardwareMap.get(CRServo.class, "armHeightServoRight");
 
-		armHeightServo2.setDirection(DcMotorSimple.Direction.REVERSE);
+		armHeightServoRight.setDirection(DcMotorSimple.Direction.REVERSE);
 
-		armOpenClosedServo = callingOpMode.hardwareMap.get(CRServo.class, "armOpenClosedServoLeft");
-		armOpenClosedServo2 = callingOpMode.hardwareMap.get(CRServo.class, "armOpenClosedServoRight");
+		armOpenClosedServoLeft = callingOpMode.hardwareMap.get(CRServo.class, "armOpenClosedServoLeft");
+		armOpenClosedServoRight = callingOpMode.hardwareMap.get(CRServo.class, "armOpenClosedServoRight");
 
-		armOpenClosedServo2.setDirection(DcMotorSimple.Direction.REVERSE);
+		armOpenClosedServoLeft.setDirection(DcMotorSimple.Direction.REVERSE);
 
 		imu = callingOpMode.hardwareMap.get(IMU.class, "imu");
 	}

@@ -49,6 +49,8 @@ public class MainOpmode extends LinearOpMode {
 	@Override
 	public void runOpMode() {
 
+		waitForStart();
+
 		hardware = new Hardware(this);
 		hardware.init();
 
@@ -66,8 +68,6 @@ public class MainOpmode extends LinearOpMode {
 		states.put(StateEnum.CatchRope, new CatchRopeState(this, hardware, drivetrain, arms, lifter));
 		states.put(StateEnum.Climb, new ClimbState(this, hardware, arms, lifter));
 
-		waitForStart();
-
 		while (opModeIsActive()) {
 
 			State current_state_class = states.get(current_state_key);
@@ -77,7 +77,7 @@ public class MainOpmode extends LinearOpMode {
 			long since_next_state_button_pressed_ms = now - next_state_button_pressed_time;
 			long since_previous_state_button_pressed_ms = now - previous_state_button_pressed_time;
 
-			if (gamepad1.x && !next_state_button_last && since_next_state_button_pressed_ms > button_bounce_ms) {
+			if (gamepad1.y && !next_state_button_last && since_next_state_button_pressed_ms > button_bounce_ms) {
 				next_state_button_pressed_time = now;
 
 				switch (current_state_key) {
@@ -94,7 +94,7 @@ public class MainOpmode extends LinearOpMode {
 				}
 			}
 
-			if (gamepad1.y && !previous_state_button_last && since_previous_state_button_pressed_ms > button_bounce_ms) {
+			if (gamepad1.x && !previous_state_button_last && since_previous_state_button_pressed_ms > button_bounce_ms) {
 				previous_state_button_pressed_time = now;
 
 				switch (current_state_key) {
@@ -111,12 +111,13 @@ public class MainOpmode extends LinearOpMode {
 				}
 			}
 
-			next_state_button_last = gamepad1.x;
-			previous_state_button_last = gamepad1.y;
+			next_state_button_last = gamepad1.y;
+			previous_state_button_last = gamepad1.x;
+
+			telemetry.addData("state", current_state_key.toString());
 
 			current_state_class.loop();
 
-			telemetry.addData("state", current_state_key.toString());
 			telemetry.update();
 		}
 	}

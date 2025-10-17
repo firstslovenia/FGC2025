@@ -17,14 +17,14 @@ public class Lifter {
 
 	/// Called to enable the motors, setup what we need to be able to use the lifter
 	public void initialize() {
-		hardware.lifterMotor1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-		hardware.lifterMotor2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+		hardware.lifterMotorLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+		hardware.lifterMotorRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 	}
 
 	/// Called to undo initialize
 	public void uninitialize() {
-		hardware.lifterMotor1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-		hardware.lifterMotor2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+		hardware.lifterMotorLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+		hardware.lifterMotorRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 	}
 
 	public void update(Double climb_up_power) {
@@ -32,7 +32,7 @@ public class Lifter {
 		climb_up_power = Double.max(-1.0, climb_up_power);
 		climb_up_power = Double.min(1.0, climb_up_power);
 
-		hardware.lifterMotor1.setPower(climb_up_power);
-		hardware.lifterMotor2.setPower(climb_up_power);
+		hardware.lifterMotorLeft.setPower(climb_up_power);
+		hardware.lifterMotorRight.setPower(climb_up_power);
 	}
 }

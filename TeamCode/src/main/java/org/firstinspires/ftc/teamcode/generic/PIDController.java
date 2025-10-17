@@ -14,7 +14,7 @@ public abstract class PIDController {
 	public Optional<LinearOpMode> callingOpMode;
 
 	/// Whether or not to print debug values to telemetry
-	public boolean debug = true;
+	public boolean debug;
 
 	public PIDController() {
 		this.callingOpMode = Optional.empty();

@@ -29,8 +29,8 @@ public class Arms {
 		right_servo_power = Double.max(-1.0, right_servo_power);
 		right_servo_power = Double.min(1.0, right_servo_power);
 
-		hardware.armHeightServo2.setPower(left_servo_power);
-		hardware.armHeightServo.setPower(right_servo_power);
+		hardware.armHeightServoLeft.setPower(left_servo_power);
+		hardware.armHeightServoRight.setPower(right_servo_power);
 	}
 
 	// Positive power -> up
@@ -41,8 +41,8 @@ public class Arms {
 		servo_power = Double.max(-1.0, servo_power);
 		servo_power = Double.min(1.0, servo_power);
 
-		hardware.armHeightServo.setPower(servo_power);
-		hardware.armHeightServo2.setPower(servo_power);
+		hardware.armHeightServoLeft.setPower(servo_power);
+		hardware.armHeightServoRight.setPower(servo_power);
 	}
 
 	// Positive power -> open
@@ -57,8 +57,8 @@ public class Arms {
 		right_servo_power = Double.max(-1.0, right_servo_power);
 		right_servo_power = Double.min(1.0, right_servo_power);
 
-		hardware.armOpenClosedServo.setPower(left_servo_power);
-		hardware.armOpenClosedServo2.setPower(right_servo_power);
+		hardware.armOpenClosedServoLeft.setPower(left_servo_power);
+		hardware.armOpenClosedServoRight.setPower(right_servo_power);
 	}
 
 	// Positive power -> open
@@ -69,7 +69,7 @@ public class Arms {
 		servo_power = Double.max(-1.0, servo_power);
 		servo_power = Double.min(1.0, servo_power);
 
-		hardware.armOpenClosedServo.setPower(servo_power);
-		hardware.armOpenClosedServo2.setPower(servo_power);
+		hardware.armOpenClosedServoLeft.setPower(servo_power);
+		hardware.armOpenClosedServoRight.setPower(servo_power);
 	}
 }
