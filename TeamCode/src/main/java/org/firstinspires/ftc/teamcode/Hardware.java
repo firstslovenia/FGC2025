@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.IMU;
+import com.qualcomm.robotcore.hardware.Servo;
 
 public class Hardware {
 
@@ -35,8 +36,8 @@ public class Hardware {
 	public static CRServo armHeightServoRight = null;
 
 	// Arms open / closed
-	public static CRServo armOpenClosedServoLeft = null;
-	public static CRServo armOpenClosedServoRight = null;
+	public static Servo armOpenClosedServoLeft = null;
+	public static Servo armOpenClosedServoRight = null;
 
 	public static IMU imu = null;
 
@@ -70,10 +71,10 @@ public class Hardware {
 
 		armHeightServoRight.setDirection(DcMotorSimple.Direction.REVERSE);
 
-		armOpenClosedServoLeft = callingOpMode.hardwareMap.get(CRServo.class, "armOpenClosedServoLeft");
-		armOpenClosedServoRight = callingOpMode.hardwareMap.get(CRServo.class, "armOpenClosedServoRight");
+		armOpenClosedServoLeft = callingOpMode.hardwareMap.get(Servo.class, "armOpenClosedServoLeft");
+		armOpenClosedServoRight = callingOpMode.hardwareMap.get(Servo.class, "armOpenClosedServoRight");
 
-		armOpenClosedServoLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+		armOpenClosedServoLeft.setDirection(Servo.Direction.REVERSE);
 
 		imu = callingOpMode.hardwareMap.get(IMU.class, "imu");
 	}

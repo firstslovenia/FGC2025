@@ -75,9 +75,9 @@ public class DriveState implements State {
 		}
 
 		if (opmode.gamepad2.dpad_left) {
-			arms.update_open_closed(arms_horizontal_power * 0.25, 0.0);
+			arms.update_open_closed(arms_horizontal_power * 0.5, 0.0);
 		} else if (opmode.gamepad2.dpad_right) {
-			arms.update_open_closed(0.0, arms_horizontal_power * 0.25);
+			arms.update_open_closed(0.0, arms_horizontal_power * 0.5);
 		} else {
 			arms.update_open_closed(arms_horizontal_power);
 		}

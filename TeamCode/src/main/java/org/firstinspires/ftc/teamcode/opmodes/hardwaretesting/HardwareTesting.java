@@ -57,10 +57,12 @@ public class HardwareTesting extends LinearOpMode {
 						hardware.armHeightServoRight.setPower(power);
 						break;
 					case ServoOpenClosedLeft:
-						hardware.armOpenClosedServoLeft.setPower(power);
+						// FIXME
+						//hardware.armOpenClosedServoLeft.setPower(power);
 						break;
 					case ServoOpenClosedRight:
-						hardware.armOpenClosedServoRight.setPower(power);
+						// FIXME
+						//hardware.armOpenClosedServoRight.setPower(power);
 						break;
 				}
 
