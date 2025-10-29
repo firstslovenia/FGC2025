@@ -106,7 +106,8 @@ public class DriveState implements State {
 		}
 		toggle_keep_heading_button_last = opmode.gamepad1.b;
 
-		Vector2D translation_vector = new Vector2D(opmode.gamepad1.left_stick_x, opmode.gamepad1.left_stick_y);
+		// Note: up is negative!
+		Vector2D translation_vector = new Vector2D(opmode.gamepad1.left_stick_x, -opmode.gamepad1.left_stick_y);
 		boolean override_field_centric = false;
 
 		if (opmode.gamepad1.dpad_up || opmode.gamepad1.dpad_down || opmode.gamepad1.dpad_left || opmode.gamepad1.dpad_right) {
@@ -121,6 +122,6 @@ public class DriveState implements State {
 			override_field_centric = true;
 		}
 
-		drivetrain.update(translation_vector, new Vector2D(opmode.gamepad1.right_stick_x, opmode.gamepad1.right_stick_y), override_field_centric);
+		drivetrain.update(translation_vector, new Vector2D(opmode.gamepad1.right_stick_x, -opmode.gamepad1.right_stick_y), override_field_centric);
 	}
 }
