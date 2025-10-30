@@ -23,7 +23,9 @@ public class Lifter {
 
 	/// Called to undo initialize
 	public void uninitialize() {
+		hardware.lifterMotorLeft.setPower(0);
 		hardware.lifterMotorLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+		hardware.lifterMotorRight.setPower(0);
 		hardware.lifterMotorRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 	}
 
