@@ -2,7 +2,9 @@ package org.firstinspires.ftc.teamcode.opmodes.hardwaretesting;
 
 import com.qualcomm.robotcore.eventloop.opmode.*;
 
+import org.firstinspires.ftc.teamcode.Arms;
 import org.firstinspires.ftc.teamcode.Hardware;
+import org.firstinspires.ftc.teamcode.Lifter;
 
 @TeleOp(name = "Hardware Testing")
 public class HardwareTesting extends LinearOpMode {
@@ -25,11 +27,14 @@ public class HardwareTesting extends LinearOpMode {
 		hardware = new Hardware(this);
 		hardware.init();
 
+		Arms arms = new Arms(this, hardware);
+		Lifter lifter = new Lifter(this, hardware);
+
 		waitForStart();
 
 		while (opModeIsActive()) {
 
-				float power = gamepad1.right_stick_y;
+				float power = -gamepad1.right_stick_y;
 
 				switch(selected_component) {
 					case MotorLeftForward:
@@ -56,13 +61,14 @@ public class HardwareTesting extends LinearOpMode {
 					case ServoUpDownRight:
 						hardware.armHeightServoRight.setPower(power);
 						break;
-					case ServoOpenClosedLeft:
-						// FIXME
-						//hardware.armOpenClosedServoLeft.setPower(power);
+					case ArmsOpenClosed:
+						arms.update_open_closed((double) power);
 						break;
-					case ServoOpenClosedRight:
-						// FIXME
-						//hardware.armOpenClosedServoRight.setPower(power);
+					case ArmsUpDown:
+						arms.update_up_down((double) power);
+						break;
+					case Lifter:
+						lifter.update((double) power);
 						break;
 				}
 
@@ -71,12 +77,32 @@ public class HardwareTesting extends LinearOpMode {
 				long since_previous_button_pressed_ms = now - previous_button_pressed_time;
 
 				if (gamepad1.a && !next_button_last && since_next_button_pressed_ms > button_bounce_ms) {
+
+					if (selected_component == HardwareComponent.Lifter) {
+						lifter.uninitialize();
+					}
+
 					selected_component = selected_component.next();
+
+					if (selected_component == HardwareComponent.Lifter) {
+						lifter.initialize();
+					}
+
 					next_button_pressed_time = now;
 				}
 
 				if (gamepad1.b && !previous_button_last && since_previous_button_pressed_ms > button_bounce_ms) {
+
+					if (selected_component == HardwareComponent.Lifter) {
+						lifter.uninitialize();
+					}
+
 					selected_component = selected_component.previous();
+
+					if (selected_component == HardwareComponent.Lifter) {
+						lifter.initialize();
+					}
+
 					previous_button_pressed_time = now;
 				}
 
@@ -84,6 +110,8 @@ public class HardwareTesting extends LinearOpMode {
 				previous_button_last = gamepad1.b;
 
 				telemetry.addData("selected component", selected_component);
+				telemetry.addData("left motor pos", hardware.armOpenClosedMotorLeft.getTargetPosition());
+				telemetry.addData("right motor pos", hardware.armOpenClosedMotorLeft.getTargetPosition());
 				telemetry.addData("power", power);
 				telemetry.update();
 		}

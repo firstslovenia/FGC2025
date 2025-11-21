@@ -9,8 +9,9 @@ public enum HardwareComponent {
 	MotorLifterRight,
 	ServoUpDownLeft,
 	ServoUpDownRight,
-	ServoOpenClosedLeft,
-	ServoOpenClosedRight;
+	ArmsUpDown,
+	ArmsOpenClosed,
+	Lifter;
 
 	private static final HardwareComponent[] values = values();
 

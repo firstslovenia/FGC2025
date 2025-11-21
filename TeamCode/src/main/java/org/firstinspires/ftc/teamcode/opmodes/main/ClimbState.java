@@ -53,6 +53,10 @@ public class ClimbState implements State {
 			lifter_power += 0.5;
 		}
 
+		if (opmode.gamepad2.guide) {
+			lifter.start_final_ascent();
+		}
+
 		lifter.update(lifter_power);
 
 		double arms_vertical_power = 0.0;

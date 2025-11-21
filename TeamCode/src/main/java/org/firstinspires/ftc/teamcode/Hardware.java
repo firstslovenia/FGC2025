@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -39,6 +40,10 @@ public class Hardware {
 	public static Servo armOpenClosedServoLeft = null;
 	public static Servo armOpenClosedServoRight = null;
 
+	public static DcMotor armOpenClosedMotorLeft = null;
+
+	public static DcMotor armOpenClosedMotorRight = null;
+
 	public static IMU imu = null;
 
 	public Hardware (LinearOpMode opmode) {
@@ -71,11 +76,12 @@ public class Hardware {
 
 		armHeightServoRight.setDirection(DcMotorSimple.Direction.REVERSE);
 
-		armOpenClosedServoLeft = callingOpMode.hardwareMap.get(Servo.class, "armOpenClosedServoLeft");
-		armOpenClosedServoRight = callingOpMode.hardwareMap.get(Servo.class, "armOpenClosedServoRight");
+		armOpenClosedMotorLeft = callingOpMode.hardwareMap.get(DcMotor.class, "armOpenClosedMotorLeft");
+		armOpenClosedMotorRight = callingOpMode.hardwareMap.get(DcMotor.class, "armOpenClosedMotorRight");
 
-		armOpenClosedServoLeft.setDirection(Servo.Direction.REVERSE);
+		armOpenClosedMotorRight.setDirection(DcMotorSimple.Direction.REVERSE);
 
 		imu = callingOpMode.hardwareMap.get(IMU.class, "imu");
+		imu.initialize(new IMU.Parameters(new RevHubOrientationOnRobot(RevHubOrientationOnRobot.LogoFacingDirection.UP, RevHubOrientationOnRobot.UsbFacingDirection.RIGHT)));
 	}
 }
